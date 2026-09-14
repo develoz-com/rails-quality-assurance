@@ -17,18 +17,18 @@ namespace :qa do
   task lint: %w[qa:rubocop qa:reek qa:flay qa:brakeman qa:audit]
 
   desc 'Run RuboCop'
-  task rubocop: :environment do
+  task :rubocop do
     sh 'bundle exec rubocop'
   end
 
   desc 'Run Reek code smell detection'
-  task reek: :environment do
+  task :reek do
     config = File.exist?('.reek.yml') ? '' : "-c #{RailsQualityAssurance.reek_config_path}"
     sh "bundle exec reek #{config} app lib"
   end
 
   desc 'Run Flay structural code duplication analysis'
-  task flay: :environment do
+  task :flay do
     mass = ENV.fetch('FLAY_MASS', '300')
     output = `bundle exec flay --mass #{mass} app lib`
     puts output
@@ -36,18 +36,18 @@ namespace :qa do
   end
 
   desc 'Run Brakeman static security analysis'
-  task brakeman: :environment do
+  task :brakeman do
     sh 'bundle exec brakeman --quiet --no-pager --exit-on-warn --exit-on-error'
   end
 
   desc 'Run Bundler Audit for vulnerable gems'
-  task audit: :environment do
+  task :audit do
     sh 'bundle exec bundle audit check --update'
   end
 
   namespace :lint do
     desc 'Run BiomeJS on JS/TS/JSON'
-    task biome: :environment do
+    task :biome do
       if npm_script?('biome')
         sh 'npm run biome'
       else
@@ -57,7 +57,7 @@ namespace :qa do
     end
 
     desc 'Run Stylelint on CSS'
-    task stylelint: :environment do
+    task :stylelint do
       if npm_script?('stylelint')
         sh 'npm run stylelint'
       else
@@ -73,19 +73,6 @@ namespace :qa do
   desc 'Run all CI checks'
   task ci: %w[qa:lint qa:frontend spec:parallel]
 end
-
-namespace :lint do
-  desc 'Alias for qa:lint'
-  task all: 'qa:lint'
-
-  desc 'Run BiomeJS linter'
-  task biome: 'qa:lint:biome'
-
-  desc 'Run Stylelint on CSS'
-  task stylelint: 'qa:lint:stylelint'
-end
-
-task lint: 'qa:lint'
 
 namespace :spec do
   desc 'Run specs in parallel with system specs isolated'

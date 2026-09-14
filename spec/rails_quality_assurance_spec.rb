@@ -1,10 +1,23 @@
 # frozen_string_literal: true
 
 require 'rails_quality_assurance'
+require 'rake'
 require 'rubocop'
 require 'yaml'
 
 RSpec.describe RailsQualityAssurance do
+  def in_fresh_rake_application
+    original = Rake.application
+    Rake.application = Rake::Application.new
+    yield
+  ensure
+    Rake.application = original
+  end
+
+  def load_quality_assurance_tasks
+    load File.join(described_class.root, 'lib/tasks/quality_assurance.rake')
+  end
+
   describe 'VERSION' do
     it 'is a semantic version string' do
       expect(described_class::VERSION).to match(/\A\d+\.\d+\.\d+\z/)
@@ -79,8 +92,33 @@ RSpec.describe RailsQualityAssurance do
     end
 
     it 'registers the parallel_tests rake tasks' do
-      expect { require 'parallel_tests/tasks' }.not_to raise_error
-      expect(Rake::Task.task_defined?('parallel:create')).to be(true)
+      in_fresh_rake_application do
+        load Gem.find_files('parallel_tests/tasks.rb').first
+        expect(Rake::Task.task_defined?('parallel:create')).to be(true)
+      end
+    end
+
+    it 'namespaces its tasks under qa: without hijacking app tasks' do
+      in_fresh_rake_application do
+        load_quality_assurance_tasks
+
+        expect(Rake::Task.task_defined?('qa:lint')).to be(true)
+        expect(Rake::Task.task_defined?('qa:reek')).to be(true)
+        expect(Rake::Task.task_defined?('qa:lint:biome')).to be(true)
+        expect(Rake::Task.task_defined?('lint')).to be(false)
+      end
+    end
+
+    it 'does not boot the Rails environment for shell-based checks' do
+      in_fresh_rake_application do
+        load_quality_assurance_tasks
+
+        %w[qa:rubocop qa:reek qa:flay qa:brakeman qa:audit qa:lint:biome qa:lint:stylelint]
+          .each do |name|
+            expect(Rake::Task[name].prerequisites).not_to include('environment'),
+                                                          "#{name} must not require :environment"
+          end
+      end
     end
   end
 
