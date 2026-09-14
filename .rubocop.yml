@@ -10,3 +10,11 @@ Gemspec/DevelopmentDependencies:
 Metrics/MethodLength:
   Exclude:
     - "bin/ci"
+
+Rails/Output:
+  Exclude:
+    - "lib/rails_quality_assurance/ci.rb"
+
+Rails/Exit:
+  Exclude:
+    - "lib/rails_quality_assurance/ci.rb"

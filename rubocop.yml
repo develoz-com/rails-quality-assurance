@@ -78,6 +78,7 @@ Metrics/MethodLength:
 Metrics/BlockLength:
   Exclude:
     - "config/**/*"
+    - "lib/tasks/**/*"
 
 Metrics/CyclomaticComplexity:
   Max: 10

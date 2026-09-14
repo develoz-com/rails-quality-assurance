@@ -23,12 +23,13 @@ end
 
 puts
 puts '=' * 60
-puts 'rubocop-develoz CI Pipeline'
+puts 'rails-quality-assurance CI Pipeline'
 puts '=' * 60
 
 run_step('RuboCop', 'bundle exec rubocop')
+run_step('Reek', 'bundle exec reek --config .reek.yml lib')
 run_step('RSpec', 'bundle exec rspec')
-run_step('Gem build', 'gem build rubocop-develoz.gemspec')
+run_step('Gem build', 'gem build rails-quality-assurance.gemspec')
 
 puts
 puts '=' * 60
