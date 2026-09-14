@@ -18,3 +18,8 @@ Rails/Output:
 Rails/Exit:
   Exclude:
     - "lib/rails_quality_assurance/ci.rb"
+
+# This gem is not a Rails app; rake tasks do not boot an environment
+# This gem is not a Rails app; rake tasks do not boot an environment
+Rails/RakeEnvironment:
+  Enabled: false
