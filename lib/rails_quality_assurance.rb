@@ -27,4 +27,4 @@ module RailsQualityAssurance
   end
 end
 
-require 'rails_quality_assurance/railtie' if defined?(Rails::Railtie)
+require 'rails_quality_assurance/railtie'
