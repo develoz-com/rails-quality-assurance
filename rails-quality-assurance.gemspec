@@ -42,8 +42,8 @@ Gem::Specification.new do |spec|
   # Testing & Coverage
   spec.add_dependency 'parallel_tests', '>= 5.0'
   spec.add_dependency 'rspec-rails', '>= 7.0'
-  spec.add_dependency 'simplecov', '>= 0.22'
-  spec.add_dependency 'simplecov-lcov', '>= 0.8'
+  spec.add_dependency 'simplecov', '~> 0.22.0'
+  spec.add_dependency 'simplecov-lcov', '~> 0.9.0'
 
   # Browser & System testing
   spec.add_dependency 'capybara', '>= 3.40'
