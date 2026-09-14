@@ -65,4 +65,22 @@ RSpec.describe RailsQualityAssurance do
       expect(config.dig('Style/Documentation', 'Enabled')).to be(false)
     end
   end
+
+  describe 'gem dependencies' do
+    let(:spec) { Gem::Specification.load(File.join(described_class.root, 'rails-quality-assurance.gemspec')) }
+
+    it 'owns the full QA toolchain as runtime dependencies' do
+      runtime = spec.runtime_dependencies.map(&:name)
+      expect(runtime).to include(
+        'parallel_tests', 'rspec-rails', 'simplecov', 'simplecov-lcov',
+        'capybara', 'capybara-playwright-driver', 'playwright-ruby-client',
+        'brakeman', 'bundler-audit', 'flay', 'reek', 'rubocop'
+      )
+    end
+
+    it 'registers the parallel_tests rake tasks' do
+      expect { require 'parallel_tests/tasks' }.not_to raise_error
+      expect(Rake::Task.task_defined?('parallel:create')).to be(true)
+    end
+  end
 end

@@ -2,12 +2,7 @@
 
 require 'json'
 require 'rails_quality_assurance'
-
-begin
-  require 'parallel_tests/tasks'
-rescue LoadError
-  # parallel_tests is optional; spec:parallel will fail loudly if it is missing
-end
+require 'parallel_tests/tasks'
 
 def npm_script?(name)
   return false unless File.exist?('package.json')
