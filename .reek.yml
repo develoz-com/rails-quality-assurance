@@ -1,0 +1,29 @@
+---
+# Base Reek smell detectors for the gem itself
+exclude_paths:
+  - config
+  - spec
+  - vendor
+
+detectors:
+  IrresponsibleModule:
+    enabled: false
+  UtilityFunction:
+    enabled: false
+  ControlParameter:
+    enabled: false
+  BooleanParameter:
+    enabled: false
+  FeatureEnvy:
+    enabled: false
+  TooManyStatements:
+    max_statements: 15
+  TooManyMethods:
+    max_methods: 25
+  UncommunicativeVariableName:
+    accept:
+      - e
+      - id
+      - f
+      - i
+      - n

@@ -1,0 +1,47 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-tailwindcss"
+  ],
+  "rules": {
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "tailwindcss",
+          "apply",
+          "variants",
+          "responsive",
+          "screen",
+          "layer",
+          "variant",
+          "import",
+          "source",
+          "theme",
+          "custom-variant",
+          "plugin"
+        ]
+      }
+    ],
+    "function-no-unknown": [
+      true,
+      {
+        "ignoreFunctions": [
+          "theme",
+          "screen",
+          "font-url"
+        ]
+      }
+    ],
+    "at-rule-descriptor-value-no-unknown": null,
+    "no-descending-specificity": null,
+    "no-invalid-position-at-import-rule": null,
+    "selector-class-pattern": null,
+    "custom-property-pattern": null,
+    "font-family-name-quotes": null,
+    "property-no-deprecated": null,
+    "import-notation": "string",
+    "alpha-value-notation": "number",
+    "color-function-notation": "modern"
+  }
+}
