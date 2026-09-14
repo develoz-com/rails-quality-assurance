@@ -1,0 +1,139 @@
+# Develoz Ruby styling.
+#
+# Shared baseline for all Develoz projects. Application-specific tweaks
+# (file excludes, loosened metrics) belong in the project's own
+# .rubocop.yml, which inherits this file.
+#
+# Never remove this line.
+# This merges default exclusions which makes running rubocop much faster.
+inherit_mode:
+  merge:
+    - Exclude
+
+plugins:
+  - rubocop-performance
+  - rubocop-rspec
+  - rubocop-rspec_rails
+  - rubocop-capybara
+  - rubocop-factory_bot
+  - rubocop-rubycw
+  - rubocop-migration
+  - rubocop-rails
+
+AllCops:
+  TargetRubyVersion: 3.4
+  NewCops: enable
+  Exclude:
+    - "bin/*"
+    - "db/schema.rb"
+    - "db/migrate/**/*.rb"
+    - "vendor/**/*"
+    - "config/locales/**/*.yml"
+
+FactoryBot/ExcessiveCreateList:
+  MaxAmount: 15
+
+Layout/LineLength:
+  Max: 120
+  AllowedPatterns:
+    - !ruby/regexp /^ *# /
+
+Migration/AddIndexColumnsCount:
+  Enabled: true
+  MaxColumnsCount: 4
+
+Migration/AddIndexConcurrently:
+  Enabled: true
+
+Migration/AddIndexDuplicate:
+  Enabled: true
+
+Migration/Jsonb:
+  Enabled: true
+
+Naming/VariableNumber:
+  Enabled: false
+
+Rails/SkipsModelValidations:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/SafeNavigationChainLength:
+  Enabled: false
+
+Style/HashSyntax:
+  EnforcedShorthandSyntax: always
+
+Metrics/AbcSize:
+  Max: 35
+
+Metrics/MethodLength:
+  Max: 30
+
+Metrics/BlockLength:
+  Exclude:
+    - "config/**/*"
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+Metrics/PerceivedComplexity:
+  Max: 10
+
+# RSpec system tests naturally have multiple expectations
+RSpec/MultipleExpectations:
+  Max: 5
+  Exclude:
+    - "spec/system/**/*"
+    - "spec/views/**/*"
+    - "spec/helpers/**/*"
+
+# RSpec system tests can be longer
+RSpec/ExampleLength:
+  Max: 15
+  Exclude:
+    - "spec/system/**/*"
+    - "spec/views/**/*"
+    - "spec/helpers/**/*"
+
+# We might want to check texts in tests
+Rails/I18nLocaleTexts:
+  Exclude:
+    - "spec/**/*"
+
+# Allow more memoized helpers in specs for comprehensive testing
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
+
+# Allow I18n.locale assignment in test setup blocks
+Rails/I18nLocaleAssignment:
+  Exclude:
+    - "spec/**/*"
+
+# Allow allow_any_instance_of
+RSpec/AnyInstance:
+  Enabled: false
+
+# Allow expect_any_instance_of
+RSpec/StubbedMock:
+  Enabled: false
+
+# Allow message chains
+RSpec/MessageChain:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Max: 6
+
+# Allow let! setup in specs where roles/associations are needed
+RSpec/LetSetup:
+  Exclude:
+    - "spec/system/**/*"
+    - "spec/requests/**/*"
+    - "spec/controllers/**/*"
+
+# Capybara negation matcher warnings are false positives for have_no_*
+Capybara/RSpec/NegationMatcherAfterVisit:
+  Enabled: false
