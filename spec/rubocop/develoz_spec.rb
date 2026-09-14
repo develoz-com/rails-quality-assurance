@@ -36,7 +36,7 @@ RSpec.describe RuboCop::Develoz do
     end
 
     it 'targets the shared Ruby version' do
-      expect(config.dig('AllCops', 'TargetRubyVersion')).to eq(3.4)
+      expect(config.dig('AllCops', 'TargetRubyVersion')).to eq(4.0)
     end
 
     it 'keeps shared metrics and style decisions' do
