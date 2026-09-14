@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
 module RailsQualityAssurance
+  # Configures SimpleCov with parallel_tests support.
+  #
+  # SimpleCov 1.2+ infers `finalize_merge false` for parallel workers that
+  # merge into an explicit coverage destination (assumed external `collate`),
+  # which silently skips threshold enforcement. We do a plain parallel run, so
+  # we set it true: the first worker waits for its siblings, merges, formats,
+  # enforces thresholds, and writes `.last_run.json` exactly once.
   module SimpleCovHelper
     def self.configure!
       return if ENV['NO_COVERAGE']
@@ -44,6 +51,8 @@ module RailsQualityAssurance
         add_filter '/spec/'
         add_filter '/config/'
         add_filter '/vendor/'
+
+        finalize_merge true
 
         SimpleCov.minimum_coverage line: 100, branch: 100
       end

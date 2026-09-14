@@ -83,4 +83,17 @@ RSpec.describe RailsQualityAssurance do
       expect(Rake::Task.task_defined?('parallel:create')).to be(true)
     end
   end
+
+  describe 'SimpleCov parallel merge ownership' do
+    let(:helper) { File.read(File.join(described_class.root, 'lib/rails_quality_assurance/simplecov/helper.rb')) }
+
+    it 'claims finalization so thresholds are enforced once in parallel runs' do
+      expect(helper).to include('finalize_merge true')
+    end
+
+    it 'requires a SimpleCov line that provides finalize_merge' do
+      simplecov = Gem::Specification.find_by_name('simplecov')
+      expect(Gem::Requirement.new('~> 1.3.0')).to be_satisfied_by(simplecov.version)
+    end
+  end
 end
