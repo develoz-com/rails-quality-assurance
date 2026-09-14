@@ -30,15 +30,15 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |file| File.basename(file) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'rubocop', '>= 1.75'
-  spec.add_dependency 'rubocop-capybara', '~> 3.0'
-  spec.add_dependency 'rubocop-factory_bot', '>= 2.28'
-  spec.add_dependency 'rubocop-migration', '>= 0.7'
-  spec.add_dependency 'rubocop-performance', '>= 1.26'
-  spec.add_dependency 'rubocop-rails', '>= 2.34'
-  spec.add_dependency 'rubocop-rspec', '>= 3.9'
-  spec.add_dependency 'rubocop-rspec_rails', '>= 2.32'
-  spec.add_dependency 'rubocop-rubycw', '>= 0.2'
+  spec.add_dependency 'rubocop', '~> 1.85.0'
+  spec.add_dependency 'rubocop-capybara', '~> 2.22.0'
+  spec.add_dependency 'rubocop-factory_bot', '~> 2.28.0'
+  spec.add_dependency 'rubocop-migration', '~> 0.7.1'
+  spec.add_dependency 'rubocop-performance', '~> 1.26.0'
+  spec.add_dependency 'rubocop-rails', '~> 2.34.0'
+  spec.add_dependency 'rubocop-rspec', '~> 3.9.0'
+  spec.add_dependency 'rubocop-rspec_rails', '~> 2.32.0'
+  spec.add_dependency 'rubocop-rubycw', '~> 0.2.0'
 
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.13'

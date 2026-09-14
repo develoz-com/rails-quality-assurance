@@ -138,9 +138,5 @@ RSpec/LetSetup:
     - "spec/controllers/**/*"
 
 # Capybara negation matcher warnings are false positives for have_no_*
-Capybara/RSpec/NegationMatcherAfterVisit:
-  Enabled: false
-
-# have_content is the established house matcher; have_text is not a drop-in
-Capybara/RSpec/HaveContent:
+Capybara/NegationMatcherAfterVisit:
   Enabled: false

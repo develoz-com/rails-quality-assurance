@@ -2,14 +2,16 @@
 # frozen_string_literal: true
 
 require 'bundler/setup'
+require 'English'
 
 def run_step(name, command)
-  puts "\n#{'=' * 60}"
+  puts
+  puts '=' * 60
   puts "Running: #{name}"
   puts '=' * 60
 
   system(command)
-  exit_code = $CHILD_STATUS&.exitstatus
+  exit_code = $CHILD_STATUS.exitstatus
 
   if exit_code.zero?
     puts "✓ #{name} passed"
@@ -19,7 +21,8 @@ def run_step(name, command)
   end
 end
 
-puts "\n#{'=' * 60}"
+puts
+puts '=' * 60
 puts 'rubocop-develoz CI Pipeline'
 puts '=' * 60
 
@@ -27,6 +30,7 @@ run_step('RuboCop', 'bundle exec rubocop')
 run_step('RSpec', 'bundle exec rspec')
 run_step('Gem build', 'gem build rubocop-develoz.gemspec')
 
-puts "\n#{'=' * 60}"
+puts
+puts '=' * 60
 puts '✓ All CI checks passed'
 puts '=' * 60
