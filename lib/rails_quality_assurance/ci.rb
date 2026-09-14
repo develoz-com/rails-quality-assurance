@@ -15,7 +15,10 @@ module RailsQualityAssurance
       end
 
       def run
-        banner("Running: #{name}")
+        separator = '=' * 60
+        puts "\n#{separator}"
+        puts "Running: #{name}"
+        puts separator
 
         system(command)
         exit_code = $CHILD_STATUS&.exitstatus || 1
