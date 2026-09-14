@@ -31,4 +31,4 @@ jobs:
         run: gem build rails-quality-assurance.gemspec
 
       - name: Publish to RubyGems
-        run: gem push rails-quality-assurance-*.gem --platform ruby
+        run: gem push rails-quality-assurance-*.gem
