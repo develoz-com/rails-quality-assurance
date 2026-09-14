@@ -1,0 +1,20 @@
+# frozen_string_literal: true
+
+# Run using bin/ci
+CI.run do
+  step 'Setup', 'bin/setup --skip-server'
+
+  step 'Style: Ruby', 'bin/rubocop'
+  step 'Style: Reek', 'bundle exec rake qa:reek'
+  step 'Style: Flay', 'bundle exec rake qa:flay'
+
+  step 'Security: Gem audit', 'bundle exec rake qa:audit'
+  step 'Security: Brakeman', 'bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error'
+
+  step 'Frontend: Biome', 'npm run biome' if File.exist?('biome.json')
+  step 'Frontend: Stylelint', 'npm run stylelint' if File.exist?('.stylelintrc.json')
+
+  step 'Tests: RSpec (parallel)', 'bin/rails spec:parallel'
+
+  # Coverage gate: enforced by SimpleCov in spec/spec_helper.rb (100% line + branch)
+end

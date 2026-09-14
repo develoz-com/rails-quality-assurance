@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative '../config/boot'
+require 'rails_quality_assurance/ci_runner'
+
+CI = ActiveSupport::ContinuousIntegration
+require_relative '../config/ci'
