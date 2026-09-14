@@ -1,6 +1,15 @@
 # frozen_string_literal: true
 
+require 'json'
 require 'rails_quality_assurance'
+
+def npm_script?(name)
+  return false unless File.exist?('package.json')
+
+  JSON.parse(File.read('package.json')).fetch('scripts', {}).key?(name)
+rescue JSON::ParserError
+  false
+end
 
 namespace :qa do
   desc 'Run all quality assurance checks (RuboCop, Reek, Flay, Brakeman, bundler-audit)'
@@ -38,14 +47,22 @@ namespace :qa do
   namespace :lint do
     desc 'Run BiomeJS on JS/TS/JSON'
     task biome: :environment do
-      config = File.exist?('biome.json') ? '' : "--config-path #{RailsQualityAssurance.biome_config_path}"
-      sh "npx @biomejs/biome check #{config}"
+      if npm_script?('biome')
+        sh 'npm run biome'
+      else
+        config = File.exist?('biome.json') ? '' : "--config-path #{RailsQualityAssurance.biome_config_path}"
+        sh "npx --no-install @biomejs/biome check #{config}"
+      end
     end
 
     desc 'Run Stylelint on CSS'
     task stylelint: :environment do
-      config = File.exist?('.stylelintrc.json') ? '' : "--config #{RailsQualityAssurance.stylelint_config_path}"
-      sh "npx stylelint #{config} \"**/*.css\""
+      if npm_script?('stylelint')
+        sh 'npm run stylelint'
+      else
+        config = File.exist?('.stylelintrc.json') ? '' : "--config #{RailsQualityAssurance.stylelint_config_path}"
+        sh "npx --no-install stylelint #{config} \"**/*.css\""
+      end
     end
   end
 
