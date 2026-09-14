@@ -1,0 +1,18 @@
+plugins:
+  - rubocop-performance
+  - rubocop-rspec
+
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+
+# Development dependencies intentionally declared in gemspec per gem best practices
+Gemspec/DevelopmentDependencies:
+  Enabled: false
+
+Metrics/MethodLength:
+  Exclude:
+    - "bin/ci"
+
+RSpec/MultipleExpectations:
+  Max: 5
