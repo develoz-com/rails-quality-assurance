@@ -11,8 +11,8 @@ Opinionated quality assurance kit for Ruby on Rails applications.
 - **RuboCop**: Pre-configured `rubocop.yml` targeting Ruby 4.0 with all standard plugins loaded (`rubocop-rails`, `rubocop-rspec`, `rubocop-rspec_rails`, `rubocop-performance`, `rubocop-capybara`, `rubocop-factory_bot`, `rubocop-rubycw`, `rubocop-migration`).
 - **Reek**: Code smell detection with sensible Rails defaults (`config/reek.yml`).
 - **Flay**: Structural code duplication analysis.
-- **Biome**: Pre-configured `config/biome.json` for fast JavaScript/TypeScript/JSON linting and formatting.
-- **Stylelint**: Pre-configured `config/.stylelintrc.json` with Tailwind CSS support.
+- **Biome**: Pre-configured `config/biome-default.json` for fast JavaScript/TypeScript/JSON linting and formatting.
+- **Stylelint**: Pre-configured `config/stylelint-default.json` with Tailwind CSS support.
 
 ### 2. Security
 

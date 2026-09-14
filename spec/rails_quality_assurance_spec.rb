@@ -37,11 +37,11 @@ RSpec.describe RailsQualityAssurance do
       expect(File.exist?(described_class.reek_config_path)).to be(true)
     end
 
-    it 'locates biome.json' do
+    it 'locates the packaged biome default' do
       expect(File.exist?(described_class.biome_config_path)).to be(true)
     end
 
-    it 'locates .stylelintrc.json' do
+    it 'locates the packaged stylelint default' do
       expect(File.exist?(described_class.stylelint_config_path)).to be(true)
     end
   end

@@ -19,11 +19,11 @@ module RailsQualityAssurance
   end
 
   def self.biome_config_path
-    File.join(root, 'config/biome.json')
+    File.join(root, 'config/biome-default.json')
   end
 
   def self.stylelint_config_path
-    File.join(root, 'config/.stylelintrc.json')
+    File.join(root, 'config/stylelint-default.json')
   end
 end
 
