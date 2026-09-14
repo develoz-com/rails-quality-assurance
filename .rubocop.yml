@@ -1,9 +1,6 @@
-plugins:
-  - rubocop-performance
-  - rubocop-rspec
+inherit_from: rubocop.yml
 
 AllCops:
-  NewCops: enable
   SuggestExtensions: false
 
 # Development dependencies intentionally declared in gemspec per gem best practices
@@ -13,6 +10,3 @@ Gemspec/DevelopmentDependencies:
 Metrics/MethodLength:
   Exclude:
     - "bin/ci"
-
-RSpec/MultipleExpectations:
-  Max: 5
