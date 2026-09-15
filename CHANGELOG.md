@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-09-14
+
+### Added
+
+- `rails_quality_assurance/rails_helper`: one require applying the shared Rails
+  test configuration (schema check, transactional fixtures, spec-type inference,
+  Rails backtrace filtering, FactoryBot, time helpers, WebMock lockdown with a
+  loopback/Playwright allowlist, I18n locale, Faker reset, CSRF toggle).
+
+### Changed
+
+- SimpleCov upgraded to 1.3 with explicit `finalize_merge` so parallel workers
+  enforce thresholds exactly once.
+- QA rake tasks live under `qa:` and no longer boot the Rails environment, so a
+  lint-only CI job passes without native image libraries.
+
+### Fixed
+
+- Packaged Biome/Stylelint configs renamed to avoid colliding with an app's root
+  configuration when the gem sits under `vendor/bundle`.
+
 ## [1.0.0] - 2026-09-14
 
 ### Added

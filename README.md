@@ -80,7 +80,29 @@ That single require sets up:
 
 *(If you prefer to load them individually, `require 'rails_quality_assurance/simplecov'` and `require 'rails_quality_assurance/playwright'` remain available.)*
 
-### 3. Continuous Integration: `bin/ci`
+### 3. Rails Test Setup (spec/rails_helper.rb)
+
+After the Rails environment boots, one require applies the shared Rails test configuration:
+
+```ruby
+require 'spec_helper'
+require_relative '../config/environment'
+require 'rails_quality_assurance/rails_helper'
+```
+
+That sets up, without any boilerplate in the app:
+
+- `ActiveRecord::Migration.maintain_test_schema!` (aborts on pending migrations)
+- `use_transactional_fixtures`, fixture paths, and `infer_spec_type_from_file_location!`
+- `filter_rails_from_backtrace!`
+- FactoryBot syntax methods and ActiveSupport time helpers
+- WebMock network lockdown with a loopback + Playwright allowlist
+- `I18n.locale = :en` before each example; `Faker::UniqueGenerator` reset after each
+- CSRF forgery protection toggled on around system specs
+
+Application-specific setup (auth helpers, custom matchers, gateway stubs) stays in the app's own `rails_helper.rb`.
+
+### 4. Continuous Integration: `bin/ci`
 
 Run the generator to install `bin/ci` and `config/ci.rb`:
 
@@ -100,7 +122,7 @@ Or in Docker-based setups:
 bin/run bin/ci
 ```
 
-### 4. Rake Tasks (Optional)
+### 5. Rake Tasks (Optional)
 
 The gem also provides tasks if you prefer `rake`:
 
