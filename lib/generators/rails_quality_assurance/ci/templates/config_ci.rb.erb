@@ -11,6 +11,7 @@ CI.run do
   step 'Style: Flay', 'bin/rails qa:flay'
 
   step 'Security: Gem audit', 'bin/rails qa:audit'
+  step 'Security: Importmap audit', 'bin/rails qa:audit:importmap' if File.exist?('config/importmap.rb')
   step 'Security: Brakeman', 'bin/rails qa:brakeman'
 
   step 'Frontend: Biome', 'bin/rails qa:lint:biome' if File.exist?('biome.json')

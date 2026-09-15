@@ -18,6 +18,10 @@ Opinionated quality assurance kit for Ruby on Rails applications.
 
 - **Brakeman**: Static analysis security vulnerability scanner.
 - **Bundler Audit**: Vulnerability scanner for gem dependencies.
+- **Importmap Audit**: Vulnerability scanner for pinned importmap packages. Runs
+  only when the app has `config/importmap.rb`, using the app `bin/importmap`
+  binstub when present and a dependency-light `importmap-rails` invocation
+  otherwise.
 
 ### 3. Testing & Coverage
 
@@ -127,9 +131,11 @@ bin/run bin/ci
 The gem also provides tasks if you prefer `rake`:
 
 ```bash
-bin/rails qa:lint          # Runs RuboCop, Reek, Flay, Brakeman, bundler-audit
-bin/rails qa:frontend      # Runs Biome and Stylelint
-bin/rails spec:parallel    # Runs RSpec in parallel with system specs isolated
+bin/rails qa:lint                # Runs RuboCop, Reek, Flay, Brakeman, bundler-audit, importmap-audit
+bin/rails qa:audit               # Runs bundler-audit
+bin/rails qa:audit:importmap     # Runs the importmap audit when config/importmap.rb exists
+bin/rails qa:frontend            # Runs Biome and Stylelint
+bin/rails spec:parallel          # Runs RSpec in parallel with system specs isolated
 ```
 
 ---

@@ -13,8 +13,8 @@ rescue JSON::ParserError
 end
 
 namespace :qa do
-  desc 'Run all quality assurance checks (RuboCop, Reek, Flay, Brakeman, bundler-audit)'
-  task lint: %w[qa:rubocop qa:reek qa:flay qa:brakeman qa:audit]
+  desc 'Run all quality assurance checks (RuboCop, Reek, Flay, Brakeman, bundler-audit, importmap-audit)'
+  task lint: %w[qa:rubocop qa:reek qa:flay qa:brakeman qa:audit qa:audit:importmap]
 
   desc 'Run RuboCop'
   task :rubocop do
@@ -40,10 +40,21 @@ namespace :qa do
     sh 'bundle exec brakeman --quiet --no-pager --exit-on-warn --exit-on-error'
   end
 
-  desc 'Run Bundler Audit for vulnerable gems'
-  task :audit do
-    sh 'bundle exec bundle audit check --update'
+  namespace :audit do
+    desc 'Run Bundler Audit for vulnerable gems'
+    task :gems do
+      sh 'bundle exec bundle audit check --update'
+    end
+
+    desc 'Run Importmap Audit for vulnerable npm packages'
+    task :importmap do
+      command = RailsQualityAssurance.importmap_audit_command
+      sh command if command
+    end
   end
+
+  desc 'Run Bundler Audit for vulnerable gems'
+  task audit: 'qa:audit:gems'
 
   namespace :lint do
     desc 'Run BiomeJS on JS/TS/JSON'

@@ -103,9 +103,13 @@ RSpec.describe RailsQualityAssurance do
       in_fresh_rake_application do
         load_quality_assurance_tasks
 
-        expect(Rake::Task.task_defined?('qa:lint')).to be(true)
-        expect(Rake::Task.task_defined?('qa:reek')).to be(true)
-        expect(Rake::Task.task_defined?('qa:lint:biome')).to be(true)
+        aggregate_failures do
+          expect(Rake::Task.task_defined?('qa:lint')).to be(true)
+          expect(Rake::Task.task_defined?('qa:reek')).to be(true)
+          expect(Rake::Task.task_defined?('qa:audit:gems')).to be(true)
+          expect(Rake::Task.task_defined?('qa:audit:importmap')).to be(true)
+          expect(Rake::Task.task_defined?('qa:lint:biome')).to be(true)
+        end
         expect(Rake::Task.task_defined?('lint')).to be(false)
       end
     end
@@ -114,12 +118,35 @@ RSpec.describe RailsQualityAssurance do
       in_fresh_rake_application do
         load_quality_assurance_tasks
 
-        %w[qa:rubocop qa:reek qa:flay qa:brakeman qa:audit qa:lint:biome qa:lint:stylelint]
-          .each do |name|
-            expect(Rake::Task[name].prerequisites).not_to include('environment'),
-                                                          "#{name} must not require :environment"
-          end
+        %w[qa:rubocop qa:reek qa:flay qa:brakeman qa:audit qa:audit:gems qa:audit:importmap
+           qa:lint:biome qa:lint:stylelint].each do |name|
+          expect(Rake::Task[name].prerequisites).not_to include('environment'),
+                                                        "#{name} must not require :environment"
+        end
       end
+    end
+
+    it 'skips the importmap audit when the app has no importmap' do
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with('config/importmap.rb').and_return(false)
+
+      expect(described_class.importmap_audit_command).to be_nil
+    end
+
+    it 'uses the app binstub for the importmap audit when present' do
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with('config/importmap.rb').and_return(true)
+      allow(File).to receive(:exist?).with('bin/importmap').and_return(true)
+
+      expect(described_class.importmap_audit_command).to eq('bin/importmap audit')
+    end
+
+    it 'falls back to importmap-rails when the app has no binstub' do
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with('config/importmap.rb').and_return(true)
+      allow(File).to receive(:exist?).with('bin/importmap').and_return(false)
+
+      expect(described_class.importmap_audit_command).to include('require "importmap/commands"')
     end
   end
 

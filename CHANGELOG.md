@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-09-15
+
+### Added
+
+- `qa:audit:gems` and `qa:audit:importmap` tasks. `qa:audit` runs the gem
+  audit, `qa:audit:importmap` audits pinned importmap packages when the app
+  has `config/importmap.rb` (skipped otherwise), and `qa:lint` runs both.
+- `RailsQualityAssurance.importmap_audit_command` resolves the importmap audit
+  command: the app `bin/importmap` binstub when present, otherwise a
+  dependency-light `importmap-rails` invocation that does not boot Rails.
+
 ## [1.2.0] - 2026-09-14
 
 ### Added
