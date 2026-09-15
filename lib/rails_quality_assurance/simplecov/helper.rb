@@ -48,9 +48,9 @@ module RailsQualityAssurance
 
         command_name "rspec#{ENV.fetch('TEST_ENV_NUMBER', nil)}"
 
-        add_filter '/spec/'
-        add_filter '/config/'
-        add_filter '/vendor/'
+        skip '/spec/'
+        skip '/config/'
+        skip '/vendor/'
 
         finalize_merge true
 

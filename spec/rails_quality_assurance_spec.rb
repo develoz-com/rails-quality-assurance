@@ -161,5 +161,9 @@ RSpec.describe RailsQualityAssurance do
       simplecov = Gem::Specification.find_by_name('simplecov')
       expect(Gem::Requirement.new('~> 1.3.0')).to be_satisfied_by(simplecov.version)
     end
+
+    it 'uses the non-deprecated SimpleCov.skip API' do
+      expect(helper).not_to match(/\badd_filter\b/)
+    end
   end
 end
