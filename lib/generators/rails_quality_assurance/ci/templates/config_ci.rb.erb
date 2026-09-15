@@ -2,7 +2,9 @@
 
 # Run using bin/ci
 CI.run do
-  step 'Setup', 'bin/setup --skip-server'
+  # CI provisions its own services and the parallel spec tasks build the test
+  # databases, so bin/setup (db:prepare + seeds) runs only for local runs.
+  step 'Setup', 'bin/setup --skip-server' unless ENV['CI']
 
   step 'Style: Ruby', 'bundle exec rubocop'
   step 'Style: Reek', 'bin/rails qa:reek'
