@@ -16,6 +16,9 @@ CI.run do
   step 'Frontend: Biome', 'bin/rails qa:lint:biome' if File.exist?('biome.json')
   step 'Frontend: Stylelint', 'bin/rails qa:lint:stylelint' if File.exist?('.stylelintrc.json')
 
+  # System specs render layouts that reference compiled assets.
+  step 'Assets: Tailwind', 'bin/rails tailwindcss:build' if File.exist?('app/assets/tailwind/application.css')
+
   step 'Tests: RSpec (parallel)', 'bin/rails spec:parallel'
 
   # Coverage gate: enforced by SimpleCov in spec/spec_helper.rb (100% line + branch)
