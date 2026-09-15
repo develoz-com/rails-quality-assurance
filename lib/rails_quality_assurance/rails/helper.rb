@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 require 'active_support/core_ext/object/blank'
+require 'factory_bot_rails'
+require 'faker'
 require 'rails_quality_assurance/playwright/helper'
 require 'uri'
+require 'webmock/rspec'
 
 module RailsQualityAssurance
   # Applies the Rails-specific RSpec configuration shared by every Develoz app.
@@ -58,13 +61,11 @@ module RailsQualityAssurance
     end
 
     def self.configure_includes(config)
-      config.include FactoryBot::Syntax::Methods if defined?(FactoryBot)
+      config.include FactoryBot::Syntax::Methods
       config.include ActiveSupport::Testing::TimeHelpers if defined?(ActiveSupport::Testing::TimeHelpers)
     end
 
     def self.configure_network(config)
-      return unless defined?(WebMock)
-
       allowed = localhost_hosts
       config.before { WebMock.disable_net_connect!(allow: allowed) }
     end
@@ -86,7 +87,7 @@ module RailsQualityAssurance
 
     def self.configure_locale(config)
       config.before { I18n.locale = :en } if defined?(I18n)
-      config.after { Faker::UniqueGenerator.clear } if defined?(Faker)
+      config.after { Faker::UniqueGenerator.clear }
     end
 
     def self.configure_forgery_protection(config)

@@ -40,10 +40,13 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'reek', '>= 6.3'
 
   # Testing & Coverage
+  spec.add_dependency 'factory_bot_rails', '>= 6.4'
+  spec.add_dependency 'faker', '>= 3.6'
   spec.add_dependency 'parallel_tests', '>= 5.0'
   spec.add_dependency 'rspec-rails', '>= 7.0'
   spec.add_dependency 'simplecov', '~> 1.3.0'
   spec.add_dependency 'simplecov-lcov', '>= 0.9'
+  spec.add_dependency 'webmock', '>= 3.0'
 
   # Browser & System testing
   spec.add_dependency 'capybara', '>= 3.40'

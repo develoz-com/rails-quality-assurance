@@ -85,9 +85,10 @@ RSpec.describe RailsQualityAssurance do
     it 'owns the full QA toolchain as runtime dependencies' do
       runtime = spec.runtime_dependencies.map(&:name)
       expect(runtime).to include(
-        'parallel_tests', 'rspec-rails', 'simplecov', 'simplecov-lcov',
-        'capybara', 'capybara-playwright-driver', 'playwright-ruby-client',
-        'brakeman', 'bundler-audit', 'flay', 'reek', 'rubocop'
+        'factory_bot_rails', 'faker', 'parallel_tests', 'rspec-rails',
+        'simplecov', 'simplecov-lcov', 'webmock', 'capybara',
+        'capybara-playwright-driver', 'playwright-ruby-client', 'brakeman',
+        'bundler-audit', 'flay', 'reek', 'rubocop'
       )
     end
 

@@ -58,6 +58,12 @@ RSpec.describe RailsQualityAssurance::RailsHelper do
   end
 
   describe '.configure!' do
+    it 'loads the standard Rails test dependencies' do
+      expect(defined?(FactoryBot)).to eq('constant')
+      expect(defined?(Faker)).to eq('constant')
+      expect(defined?(WebMock)).to eq('constant')
+    end
+
     it 'registers configuration without raising' do
       expect { described_class.configure! }.not_to raise_error
     end
