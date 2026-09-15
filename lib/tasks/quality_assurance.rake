@@ -85,8 +85,11 @@ namespace :spec do
 
     options = "--isolate --single spec/system/ --isolate-n #{isolate_tasks}"
     options << " --test-options=\"#{test_options}\"" if test_options
-    Rake::Task['parallel:create'].invoke(parallel_tasks)
-    Rake::Task['parallel:load_schema'].invoke(parallel_tasks)
-    Rake::Task['parallel:spec'].invoke(parallel_tasks, nil, nil, options)
+
+    # Each phase runs in its own rake process: parallel_tests shells out to `$0`
+    # to load a schema per worker, which only works when `$0` is a rake runner.
+    sh "bundle exec rake parallel:create[#{parallel_tasks}]"
+    sh "bundle exec rake parallel:load_schema[#{parallel_tasks}]"
+    sh "bundle exec parallel_rspec spec/ -n #{parallel_tasks} #{options}"
   end
 end
