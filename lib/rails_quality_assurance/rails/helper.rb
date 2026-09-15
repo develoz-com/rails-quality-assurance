@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'active_support/core_ext/object/blank'
+require 'rails_quality_assurance/playwright/helper'
 require 'uri'
 
 module RailsQualityAssurance
@@ -16,6 +18,7 @@ module RailsQualityAssurance
       return unless defined?(RSpec)
 
       verify_schema!
+      RailsQualityAssurance::PlaywrightHelper.configure!
       RSpec.configure do |config|
         configure_fixtures(config)
         configure_includes(config)
