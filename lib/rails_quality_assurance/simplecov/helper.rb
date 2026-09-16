@@ -26,11 +26,16 @@ module RailsQualityAssurance
 
     def self.filtered_run?
       return false unless defined?(RSpec)
+      return false if parallel_run?
 
       rspec_config = RSpec.configuration
       rspec_config.files_to_run.one? ||
         rspec_config.only_failures? ||
         (rspec_config.inclusion_filter.rules&.size&.> 0)
+    end
+
+    def self.parallel_run?
+      ENV.key?('TEST_ENV_NUMBER') || ENV.key?('PARALLEL_TEST_GROUPS') || ENV.key?('PARALLEL_PID_FILE')
     end
 
     def self.configure_lcov_formatter

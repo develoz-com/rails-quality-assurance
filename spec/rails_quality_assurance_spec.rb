@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_quality_assurance'
+require 'rails_quality_assurance/simplecov/helper'
 require 'rake'
 require 'rubocop'
 require 'yaml'
@@ -164,6 +165,79 @@ RSpec.describe RailsQualityAssurance do
 
     it 'uses the non-deprecated SimpleCov.skip API' do
       expect(helper).not_to match(/\badd_filter\b/)
+    end
+
+    describe 'SimpleCovHelper' do
+      subject(:helper_class) { RailsQualityAssurance::SimpleCovHelper }
+
+      describe '.parallel_run?' do
+        %w[TEST_ENV_NUMBER PARALLEL_TEST_GROUPS PARALLEL_PID_FILE].each do |key|
+          it "is true when #{key} is set" do
+            allow(ENV).to receive(:key?).and_call_original
+            allow(ENV).to receive(:key?).with(key).and_return(true)
+
+            expect(helper_class.parallel_run?).to be(true)
+          end
+        end
+
+        it 'is false for a plain single-process run' do
+          allow(ENV).to receive(:key?).and_call_original
+
+          expect(helper_class.parallel_run?).to be(false)
+        end
+      end
+
+      describe '.filtered_run?' do
+        def stub_parallel_env(parallel)
+          allow(ENV).to receive(:key?).and_call_original
+          %w[TEST_ENV_NUMBER PARALLEL_TEST_GROUPS PARALLEL_PID_FILE].each do |key|
+            allow(ENV).to receive(:key?).with(key).and_return(parallel)
+          end
+        end
+
+        it 'never reports a parallel worker as filtered, even when it runs a single file' do
+          stub_parallel_env(true)
+          allow(RSpec.configuration).to receive(:files_to_run).and_return([double])
+
+          expect(helper_class.filtered_run?).to be(false)
+        end
+
+        it 'reports a single-file single-process run as filtered' do
+          stub_parallel_env(false)
+          allow(RSpec.configuration).to receive_messages(
+            files_to_run: [double], only_failures?: false, inclusion_filter: double(rules: [])
+          )
+
+          expect(helper_class.filtered_run?).to be(true)
+        end
+
+        it 'reports an only-failures run as filtered' do
+          stub_parallel_env(false)
+          allow(RSpec.configuration).to receive_messages(
+            files_to_run: [double, double], only_failures?: true, inclusion_filter: double(rules: [])
+          )
+
+          expect(helper_class.filtered_run?).to be(true)
+        end
+
+        it 'reports an example-filtered run as filtered, so coverage is not enforced against a subset' do
+          stub_parallel_env(false)
+          allow(RSpec.configuration).to receive_messages(
+            files_to_run: [double, double], only_failures?: false, inclusion_filter: double(rules: [double])
+          )
+
+          expect(helper_class.filtered_run?).to be(true)
+        end
+
+        it 'reports a full single-process run as unfiltered' do
+          stub_parallel_env(false)
+          allow(RSpec.configuration).to receive_messages(
+            files_to_run: [double, double], only_failures?: false, inclusion_filter: double(rules: [])
+          )
+
+          expect(helper_class.filtered_run?).to be(false)
+        end
+      end
     end
   end
 end

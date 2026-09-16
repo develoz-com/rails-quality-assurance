@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.2] - 2026-09-16
+
+### Fixed
+
+- Parallel workers no longer skip SimpleCov when their slice covers a single
+  file. `filtered_run?` treated any one-file run as a filtered single-spec run,
+  so a worker assigned an isolated phase (e.g. `--isolate --single spec/system/`)
+  started no coverage at all. With no worker claiming the final merge, sibling
+  workers wrote resultsets that nobody merged, and the parallel run silently
+  skipped the line/branch thresholds it was supposed to enforce. Parallel runs
+  now always collect coverage, and the first worker merges and enforces.
+
 ## [1.4.1] - 2026-09-15
 
 ### Fixed
