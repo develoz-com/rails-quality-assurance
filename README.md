@@ -84,6 +84,35 @@ That single require sets up:
 
 *(If you prefer to load them individually, `require 'rails_quality_assurance/simplecov'` and `require 'rails_quality_assurance/playwright'` remain available.)*
 
+#### Configuring SimpleCov (`.simplecov`)
+
+`rails_quality_assurance` requires SimpleCov and then calls
+`SimpleCov.start 'rails'`. SimpleCov automatically loads a `.simplecov` file
+from the project root while `require 'simplecov'` runs, so anything configured
+there is applied **before** coverage starts:
+
+```ruby
+# .simplecov
+SimpleCov.configure do
+  cover_views            # measure ActionView templates (SimpleCov 1.2+)
+  track_tests            # record which test covered each line
+  group 'Components', 'app/components'
+  skip 'app/views/pwa'
+end
+```
+
+Use SimpleCov's native DSL for any option the gem does not wrap — `cover`,
+`track_tests`, `group`, `minimum_coverage`, `maximum_coverage_drop`,
+`baseline_file`, and so on. Because SimpleCov reads the file itself, a new
+SimpleCov option is available to a project without a new
+`rails-quality-assurance` release.
+
+`.simplecov` is loaded with plain `load`, so bare method calls resolve against
+`main`. Wrap them in `SimpleCov.configure` (which evaluates the block in
+SimpleCov's context, as above) or prefix each call with `SimpleCov.`. Keep it
+to configuration only: `SimpleCov.start` belongs in `spec/spec_helper.rb`, and
+SimpleCov 1.3 deprecates calling it from `.simplecov`.
+
 ### 3. Rails Test Setup (spec/rails_helper.rb)
 
 After the Rails environment boots, one require applies the shared Rails test configuration:
