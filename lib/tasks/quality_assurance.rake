@@ -95,10 +95,12 @@ namespace :spec do
     options = config.parallel_options
     options = "#{options} --test-options=\"#{test_options}\"" if test_options
 
-    # Each phase runs in its own rake process: parallel_tests shells out to `$0`
-    # to load a schema per worker, which only works when `$0` is a rake runner.
-    sh "bundle exec rake parallel:create[#{config.processors}]"
-    sh "bundle exec rake parallel:load_schema[#{config.processors}]"
-    sh "bundle exec parallel_rspec spec/ -n #{config.processors} #{options}"
+    RailsQualityAssurance::RunLock.guard(RailsQualityAssurance.spec_lock_path, command: 'spec:parallel') do
+      # Each phase runs in its own rake process: parallel_tests shells out to `$0`
+      # to load a schema per worker, which only works when `$0` is a rake runner.
+      sh "bundle exec rake parallel:create[#{config.processors}]"
+      sh "bundle exec rake parallel:load_schema[#{config.processors}]"
+      sh "bundle exec parallel_rspec spec/ -n #{config.processors} #{options}"
+    end
   end
 end

@@ -45,6 +45,10 @@ RSpec.describe RailsQualityAssurance do
     it 'locates the packaged stylelint default' do
       expect(File.exist?(described_class.stylelint_config_path)).to be(true)
     end
+
+    it 'keeps the parallel spec lock under tmp/qa' do
+      expect(described_class.spec_lock_path).to eq(File.join('tmp', 'qa', 'spec_parallel.lock'))
+    end
   end
 
   describe 'packaged rubocop.yml' do
@@ -125,6 +129,27 @@ RSpec.describe RailsQualityAssurance do
           expect(Rake::Task[name].prerequisites).not_to include('environment'),
                                                         "#{name} must not require :environment"
         end
+      end
+    end
+
+    it 'serializes the parallel spec task behind the run lock' do
+      in_fresh_rake_application do
+        load_quality_assurance_tasks
+        Rake::Task.define_task('environment')
+
+        config = instance_double(RailsQualityAssurance::ParallelSpecConfig, processors: 2, parallel_options: '')
+        allow(RailsQualityAssurance::ParallelSpecConfig).to receive(:from_env).and_return(config)
+
+        commands = []
+        allow(TOPLEVEL_BINDING.receiver).to receive(:sh) { |command| commands << command }
+        allow(RailsQualityAssurance::RunLock).to receive(:guard) do |_path, command:, &block|
+          commands << command
+          block.call
+        end
+
+        Rake::Task['spec:parallel'].invoke
+
+        expect(commands).to include('spec:parallel')
       end
     end
 

@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
+require 'rails_quality_assurance/error'
 require 'rails_quality_assurance/version'
 require 'rails_quality_assurance/ci'
 require 'rails_quality_assurance/parallel_spec_config'
+require 'rails_quality_assurance/run_lock'
 
 module RailsQualityAssurance
-  class Error < StandardError; end
-
   def self.root
     File.expand_path('..', __dir__)
   end
@@ -33,6 +33,11 @@ module RailsQualityAssurance
 
     'bundle exec ruby -e \'require "importmap-rails"; require "importmap/map"; ' \
       'ARGV.replace(["audit"]); require "importmap/commands"\''
+  end
+
+  # Shared lock file that serializes parallel spec runs for the current app.
+  def self.spec_lock_path
+    File.join('tmp', 'qa', 'spec_parallel.lock')
   end
 end
 

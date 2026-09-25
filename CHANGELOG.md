@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-09-25
+
+### Added
+
+- `spec:parallel` holds a cross-process `flock` lock
+  (`tmp/qa/spec_parallel.lock`). A second run aborts immediately with the
+  holder's command, PID, and elapsed time instead of piling workers onto the
+  machine. The kernel releases the lock when the holder exits, including on
+  SIGKILL, and the descriptor is inherited by spawned workers so the lock
+  outlives a killed coordinator for as long as any worker keeps running.
+
 ## [1.5.0] - 2026-09-25
 
 ### Changed

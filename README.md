@@ -28,7 +28,8 @@ Opinionated quality assurance kit for Ruby on Rails applications.
 - **RSpec**: Shared helpers and configuration.
 - **Playwright + Capybara**: Remote Chromium headless driver support with auto port assignment for parallel workers and HTML error state dumps on failure (`require 'rails_quality_assurance/playwright'`).
 - **Parallel Tests**: `rake spec:parallel` task that matches the CPU count by
-  default and isolates system specs into a dedicated worker.
+  default, isolates system specs into a dedicated worker, and serializes runs
+  behind a cross-process lock.
 - **SimpleCov**: 100% line and branch coverage threshold enforcement, LCOV reporting, and parallel process reporting (`require 'rails_quality_assurance/simplecov'`).
 
 ### 4. Continuous Integration Harness
@@ -180,6 +181,14 @@ Isolation workers are carved out of the total. On a 6-CPU machine the default
 run uses 6 workers: 5 for the regular suite and 1 isolated worker for
 `spec/system/`. Set `ISOLATE_SPEC_TASKS=0` to skip isolation entirely; system
 specs then run as ordinary specs.
+
+`spec:parallel` takes an exclusive `flock` on `tmp/qa/spec_parallel.lock` for
+the whole run. Starting a second run while one is in progress aborts
+immediately with the holder's command, PID, and elapsed time instead of
+doubling the worker count. The kernel releases the lock when the holder exits,
+including on SIGKILL, so a killed run never leaves a stale lock behind; spawned
+workers inherit the descriptor, so the lock stays held while any of them is
+still alive.
 
 ---
 
