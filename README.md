@@ -27,7 +27,8 @@ Opinionated quality assurance kit for Ruby on Rails applications.
 
 - **RSpec**: Shared helpers and configuration.
 - **Playwright + Capybara**: Remote Chromium headless driver support with auto port assignment for parallel workers and HTML error state dumps on failure (`require 'rails_quality_assurance/playwright'`).
-- **Parallel Tests**: `rake spec:parallel` task with automated system test isolation.
+- **Parallel Tests**: `rake spec:parallel` task that matches the CPU count by
+  default and isolates system specs into a dedicated worker.
 - **SimpleCov**: 100% line and branch coverage threshold enforcement, LCOV reporting, and parallel process reporting (`require 'rails_quality_assurance/simplecov'`).
 
 ### 4. Continuous Integration Harness
@@ -166,6 +167,19 @@ bin/rails qa:audit:importmap     # Runs the importmap audit when config/importma
 bin/rails qa:frontend            # Runs Biome and Stylelint
 bin/rails spec:parallel          # Runs RSpec in parallel with system specs isolated
 ```
+
+`spec:parallel` reads these environment variables:
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `PARALLEL_TEST_PROCESSORS` | Number of CPUs | Total worker count |
+| `ISOLATE_SPEC_TASKS` | `1` (or `0` on a single CPU) | Workers reserved for `spec/system/` |
+| `PARALLEL_SPEC_OPTIONS` | - | Extra options passed to RSpec |
+
+Isolation workers are carved out of the total. On a 6-CPU machine the default
+run uses 6 workers: 5 for the regular suite and 1 isolated worker for
+`spec/system/`. Set `ISOLATE_SPEC_TASKS=0` to skip isolation entirely; system
+specs then run as ordinary specs.
 
 ---
 

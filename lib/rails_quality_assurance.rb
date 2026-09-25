@@ -2,6 +2,7 @@
 
 require 'rails_quality_assurance/version'
 require 'rails_quality_assurance/ci'
+require 'rails_quality_assurance/parallel_spec_config'
 
 module RailsQualityAssurance
   class Error < StandardError; end

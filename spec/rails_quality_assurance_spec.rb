@@ -110,6 +110,7 @@ RSpec.describe RailsQualityAssurance do
           expect(Rake::Task.task_defined?('qa:audit:gems')).to be(true)
           expect(Rake::Task.task_defined?('qa:audit:importmap')).to be(true)
           expect(Rake::Task.task_defined?('qa:lint:biome')).to be(true)
+          expect(Rake::Task.task_defined?('spec:parallel')).to be(true)
         end
         expect(Rake::Task.task_defined?('lint')).to be(false)
       end

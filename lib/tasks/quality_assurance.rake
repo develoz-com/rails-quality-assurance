@@ -89,18 +89,16 @@ namespace :spec do
   desc 'Run specs in parallel with system specs isolated'
   task parallel: :environment do
     ENV['PARALLEL_TEST_FIRST_IS_1'] ||= 'true'
-    parallel_tasks = ENV.fetch('PARALLEL_TEST_PROCESSORS', 3).to_s
-    isolate_tasks = ENV.fetch('ISOLATE_SPEC_TASKS', 1).to_s
+    config = RailsQualityAssurance::ParallelSpecConfig.from_env
     test_options = ENV.fetch('PARALLEL_SPEC_OPTIONS', nil)
-    raise ArgumentError, 'PARALLEL_TEST_PROCESSORS must be a positive integer' if parallel_tasks.to_i <= 0
 
-    options = "--isolate --single spec/system/ --isolate-n #{isolate_tasks}"
-    options << " --test-options=\"#{test_options}\"" if test_options
+    options = config.parallel_options
+    options = "#{options} --test-options=\"#{test_options}\"" if test_options
 
     # Each phase runs in its own rake process: parallel_tests shells out to `$0`
     # to load a schema per worker, which only works when `$0` is a rake runner.
-    sh "bundle exec rake parallel:create[#{parallel_tasks}]"
-    sh "bundle exec rake parallel:load_schema[#{parallel_tasks}]"
-    sh "bundle exec parallel_rspec spec/ -n #{parallel_tasks} #{options}"
+    sh "bundle exec rake parallel:create[#{config.processors}]"
+    sh "bundle exec rake parallel:load_schema[#{config.processors}]"
+    sh "bundle exec parallel_rspec spec/ -n #{config.processors} #{options}"
   end
 end
