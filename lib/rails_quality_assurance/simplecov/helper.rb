@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'rails_quality_assurance/simplecov_config'
+
 module RailsQualityAssurance
   # Configures SimpleCov with parallel_tests support.
   #
@@ -58,9 +60,22 @@ module RailsQualityAssurance
         skip '/vendor/'
 
         finalize_merge true
-
-        SimpleCov.minimum_coverage line: 100, branch: 100
       end
+
+      apply_thresholds
+    end
+
+    # Applied after `SimpleCov.start` so `.simplecov` values supply the
+    # fallbacks instead of being overwritten by the gem defaults.
+    def self.apply_thresholds(env: ENV)
+      config = SimpleCovConfig.from_env(
+        env,
+        existing_minimum: SimpleCov.minimum_coverage,
+        existing_drop: SimpleCov.maximum_coverage_drop
+      )
+
+      SimpleCov.minimum_coverage(config.minimum_coverage)
+      SimpleCov.maximum_coverage_drop(config.maximum_coverage_drop)
     end
   end
 end

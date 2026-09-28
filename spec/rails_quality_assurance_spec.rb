@@ -2,6 +2,7 @@
 
 require 'rails_quality_assurance'
 require 'rails_quality_assurance/simplecov/helper'
+require 'simplecov'
 require 'rake'
 require 'rubocop'
 require 'yaml'
@@ -195,6 +196,48 @@ RSpec.describe RailsQualityAssurance do
 
     describe 'SimpleCovHelper' do
       subject(:helper_class) { RailsQualityAssurance::SimpleCovHelper }
+
+      describe '.apply_thresholds' do
+        let(:simplecov) { class_double(SimpleCov) }
+        let(:existing_minimum) { {} }
+        let(:existing_drop) { {} }
+
+        before do
+          stub_const('SimpleCov', simplecov)
+          allow(simplecov).to receive_messages(
+            minimum_coverage: existing_minimum,
+            maximum_coverage_drop: existing_drop
+          )
+        end
+
+        it 'applies the gem defaults when nothing is configured' do
+          helper_class.apply_thresholds(env: {})
+
+          expect(simplecov).to have_received(:minimum_coverage).with(line: 100, branch: 100)
+          expect(simplecov).to have_received(:maximum_coverage_drop).with({})
+        end
+
+        it 'lets the environment override existing thresholds' do
+          env = { 'MINIMUM_LINE_COVERAGE' => '95', 'MAXIMUM_COVERAGE_DROP' => '5' }
+          allow(simplecov).to receive_messages(
+            minimum_coverage: { line: 80, branch: 70 },
+            maximum_coverage_drop: { line: 2 }
+          )
+
+          helper_class.apply_thresholds(env:)
+
+          expect(simplecov).to have_received(:minimum_coverage).with(line: 95, branch: 70)
+          expect(simplecov).to have_received(:maximum_coverage_drop).with(line: 5)
+        end
+
+        it 'keeps the values a project configured in .simplecov' do
+          allow(simplecov).to receive(:minimum_coverage).and_return({ line: 80, branch: 70 })
+
+          helper_class.apply_thresholds(env: {})
+
+          expect(simplecov).to have_received(:minimum_coverage).with(line: 80, branch: 70)
+        end
+      end
 
       describe '.parallel_run?' do
         %w[TEST_ENV_NUMBER PARALLEL_TEST_GROUPS PARALLEL_PID_FILE].each do |key|

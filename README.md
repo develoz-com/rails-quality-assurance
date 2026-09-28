@@ -30,7 +30,9 @@ Opinionated quality assurance kit for Ruby on Rails applications.
 - **Parallel Tests**: `rake spec:parallel` task that matches the CPU count by
   default, isolates system specs into a dedicated worker, and serializes runs
   behind a cross-process lock.
-- **SimpleCov**: 100% line and branch coverage threshold enforcement, LCOV reporting, and parallel process reporting (`require 'rails_quality_assurance/simplecov'`).
+- **SimpleCov**: Line and branch coverage threshold enforcement (100% by
+  default, configurable via `.simplecov` or environment), LCOV reporting, and
+  parallel process reporting (`require 'rails_quality_assurance/simplecov'`).
 
 ### 4. Continuous Integration Harness
 
@@ -80,7 +82,7 @@ require 'rails_quality_assurance/all'
 
 That single require sets up:
 
-1. **SimpleCov**: Starts immediately before application code loads, enforcing 100% line & branch coverage thresholds, parallel process aggregation, and LCOV output.
+1. **SimpleCov**: Starts immediately before application code loads, enforcing line & branch coverage thresholds (100% by default), parallel process aggregation, and LCOV output.
 2. **RSpec**: Configures mock verification of partial doubles, expectations, and metadata inheritance.
 3. **Playwright + Capybara System Tests**: Registers the `:remote_playwright` headless driver, defaults system specs to `:rack_test`, escalates to Playwright for `js: true`, dynamically allocates ports for `parallel_tests` workers, and dumps HTML failure snapshots into `tmp/capybara`.
 
@@ -96,6 +98,10 @@ there is applied **before** coverage starts:
 ```ruby
 # .simplecov
 SimpleCov.configure do
+  enable_coverage :branch # required before branch thresholds
+  minimum_coverage line: 95, branch: 90
+  maximum_coverage_drop line: 5, branch: 2
+
   cover_views            # measure ActionView templates (SimpleCov 1.2+)
   track_tests            # record which test covered each line
   group 'Components', 'app/components'
@@ -103,10 +109,14 @@ SimpleCov.configure do
 end
 ```
 
+SimpleCov requires branch coverage to be enabled before any branch threshold is
+declared, so call `enable_coverage :branch` before setting `minimum_coverage`
+or `maximum_coverage_drop` for branches. The gem enables it too, but only after
+`.simplecov` has loaded.
+
 Use SimpleCov's native DSL for any option the gem does not wrap — `cover`,
-`track_tests`, `group`, `minimum_coverage`, `maximum_coverage_drop`,
-`baseline_file`, and so on. Because SimpleCov reads the file itself, a new
-SimpleCov option is available to a project without a new
+`track_tests`, `group`, `baseline_file`, and so on. Because SimpleCov reads the
+file itself, a new SimpleCov option is available to a project without a new
 `rails-quality-assurance` release.
 
 `.simplecov` is loaded with plain `load`, so bare method calls resolve against
@@ -114,6 +124,34 @@ SimpleCov option is available to a project without a new
 SimpleCov's context, as above) or prefix each call with `SimpleCov.`. Keep it
 to configuration only: `SimpleCov.start` belongs in `spec/spec_helper.rb`, and
 SimpleCov 1.3 deprecates calling it from `.simplecov`.
+
+#### Coverage thresholds
+
+The gem defaults to **100% line and branch** minimum coverage with no maximum
+drop. Override any of them per run with environment variables:
+
+| Variable | Purpose |
+| --- | --- |
+| `MINIMUM_LINE_COVERAGE` | Minimum line coverage (0-100) |
+| `MINIMUM_BRANCH_COVERAGE` | Minimum branch coverage (0-100) |
+| `MAXIMUM_COVERAGE_DROP` | Maximum line coverage drop (0-100) |
+| `MAXIMUM_COVERAGE_DROP_BRANCH` | Maximum branch coverage drop (0-100) |
+
+Values are resolved in this order, highest first:
+
+1. Environment variables
+2. `.simplecov` configuration
+3. Gem defaults
+
+So a project can keep a committed baseline in `.simplecov` and still relax or
+tighten a single criterion for a run:
+
+```bash
+MINIMUM_LINE_COVERAGE=90 bin/rails spec:parallel
+```
+
+Set a threshold to `0` to disable it. Invalid values abort the run with the
+offending variable named.
 
 ### 3. Rails Test Setup (spec/rails_helper.rb)
 

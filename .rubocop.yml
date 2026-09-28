@@ -24,3 +24,9 @@ Rails/Exit:
 # This gem is not a Rails app; rake tasks do not boot an environment
 Rails/RakeEnvironment:
   Enabled: false
+
+RSpec/SpecFilePathFormat:
+  CustomTransform:
+    RuboCop: rubocop
+    RSpec: rspec
+    SimpleCovConfig: simplecov_config

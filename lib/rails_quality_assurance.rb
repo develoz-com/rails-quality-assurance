@@ -5,6 +5,7 @@ require 'rails_quality_assurance/version'
 require 'rails_quality_assurance/ci'
 require 'rails_quality_assurance/parallel_spec_config'
 require 'rails_quality_assurance/run_lock'
+require 'rails_quality_assurance/simplecov_config'
 
 module RailsQualityAssurance
   def self.root

@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2026-09-28
+
+### Added
+
+- Coverage thresholds are configurable. `MINIMUM_LINE_COVERAGE`,
+  `MINIMUM_BRANCH_COVERAGE`, `MAXIMUM_COVERAGE_DROP`, and
+  `MAXIMUM_COVERAGE_DROP_BRANCH` override the 100% line/branch defaults per run,
+  and `.simplecov` values are honored. Precedence: environment, then
+  `.simplecov`, then gem defaults.
+
+### Fixed
+
+- `SimpleCov.minimum_coverage` set in `.simplecov` is no longer overwritten by
+  the gem's hardcoded 100% defaults. The defaults now apply only when the
+  project has not configured the threshold.
+
 ## [1.6.0] - 2026-09-25
 
 ### Added
