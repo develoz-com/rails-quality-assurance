@@ -36,6 +36,20 @@ module RailsQualityAssurance
       'ARGV.replace(["audit"]); require "importmap/commands"\''
   end
 
+  # Resolves the JavaScript security audit command from the lockfile in use,
+  # gating on high and critical advisories. Returns nil when none is present.
+  def self.npm_audit_command
+    if File.exist?('package-lock.json')
+      'npm audit --audit-level=high'
+    elsif File.exist?('yarn.lock')
+      # Yarn 1 ignores --level for its exit code and returns a severity bitmask
+      # (info 1, low 2, moderate 4, high 8, critical 16), so mask high|critical.
+      'yarn audit; status=$?; [ $((status & 24)) -eq 0 ]'
+    elsif File.exist?('pnpm-lock.yaml')
+      'pnpm audit --audit-level high'
+    end
+  end
+
   # Shared lock file that serializes parallel spec runs for the current app.
   def self.spec_lock_path
     File.join('tmp', 'qa', 'spec_parallel.lock')

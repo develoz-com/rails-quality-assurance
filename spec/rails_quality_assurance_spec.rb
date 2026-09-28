@@ -114,6 +114,7 @@ RSpec.describe RailsQualityAssurance do
           expect(Rake::Task.task_defined?('qa:reek')).to be(true)
           expect(Rake::Task.task_defined?('qa:audit:gems')).to be(true)
           expect(Rake::Task.task_defined?('qa:audit:importmap')).to be(true)
+          expect(Rake::Task.task_defined?('qa:audit:npm')).to be(true)
           expect(Rake::Task.task_defined?('qa:lint:biome')).to be(true)
           expect(Rake::Task.task_defined?('spec:parallel')).to be(true)
         end
@@ -126,7 +127,7 @@ RSpec.describe RailsQualityAssurance do
         load_quality_assurance_tasks
 
         %w[qa:rubocop qa:reek qa:flay qa:brakeman qa:audit qa:audit:gems qa:audit:importmap
-           qa:lint:biome qa:lint:stylelint].each do |name|
+           qa:audit:npm qa:lint:biome qa:lint:stylelint].each do |name|
           expect(Rake::Task[name].prerequisites).not_to include('environment'),
                                                         "#{name} must not require :environment"
         end
@@ -175,6 +176,45 @@ RSpec.describe RailsQualityAssurance do
       allow(File).to receive(:exist?).with('bin/importmap').and_return(false)
 
       expect(described_class.importmap_audit_command).to include('require "importmap/commands"')
+    end
+  end
+
+  describe '.npm_audit_command' do
+    def stub_lockfiles(present)
+      allow(File).to receive(:exist?).and_call_original
+      %w[package-lock.json yarn.lock pnpm-lock.yaml].each do |lockfile|
+        allow(File).to receive(:exist?).with(lockfile).and_return(present.include?(lockfile))
+      end
+    end
+
+    it 'returns nil when the app has no JavaScript lockfile' do
+      stub_lockfiles([])
+
+      expect(described_class.npm_audit_command).to be_nil
+    end
+
+    it 'runs npm audit when a package-lock.json is present' do
+      stub_lockfiles(%w[package-lock.json])
+
+      expect(described_class.npm_audit_command).to eq('npm audit --audit-level=high')
+    end
+
+    it 'runs yarn audit and masks high and critical severities for yarn.lock' do
+      stub_lockfiles(%w[yarn.lock])
+
+      expect(described_class.npm_audit_command).to eq('yarn audit; status=$?; [ $((status & 24)) -eq 0 ]')
+    end
+
+    it 'runs pnpm audit when a pnpm-lock.yaml is present' do
+      stub_lockfiles(%w[pnpm-lock.yaml])
+
+      expect(described_class.npm_audit_command).to eq('pnpm audit --audit-level high')
+    end
+
+    it 'prefers package-lock.json when multiple lockfiles exist' do
+      stub_lockfiles(%w[package-lock.json yarn.lock pnpm-lock.yaml])
+
+      expect(described_class.npm_audit_command).to start_with('npm audit')
     end
   end
 

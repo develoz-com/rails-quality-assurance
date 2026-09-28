@@ -13,8 +13,8 @@ rescue JSON::ParserError
 end
 
 namespace :qa do
-  desc 'Run all quality assurance checks (RuboCop, Reek, Flay, Brakeman, bundler-audit, importmap-audit)'
-  task lint: %w[qa:rubocop qa:reek qa:flay qa:brakeman qa:audit qa:audit:importmap]
+  desc 'Run all quality assurance checks (RuboCop, Reek, Flay, Brakeman, bundler-audit, importmap-audit, npm-audit)'
+  task lint: %w[qa:rubocop qa:reek qa:flay qa:brakeman qa:audit qa:audit:importmap qa:audit:npm]
 
   desc 'Run RuboCop'
   task :rubocop do
@@ -49,6 +49,12 @@ namespace :qa do
     desc 'Run Importmap Audit for vulnerable npm packages'
     task :importmap do
       command = RailsQualityAssurance.importmap_audit_command
+      sh command if command
+    end
+
+    desc 'Run the JavaScript package audit for the lockfile in use'
+    task :npm do
+      command = RailsQualityAssurance.npm_audit_command
       sh command if command
     end
   end

@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.2] - 2026-09-28
+
+### Added
+
+- JavaScript dependency audit as a quality gate. `qa:audit:npm` (also part of
+  `qa:lint` and the generated `config/ci.rb`) resolves the audit command from
+  the lockfile in use — `npm audit`, `yarn audit`, or `pnpm audit` — and fails
+  on high and critical advisories. Yarn 1 ignores `--level` for its exit code,
+  so its severity bitmask is masked to high|critical. Skipped when the app has
+  no lockfile.
+
+### Changed
+
+- Relaxed the RuboCop dependency pins from pessimistic (`~>`) to `>=` for
+  `rubocop`, `rubocop-capybara`, `rubocop-performance`, `rubocop-rails`, and
+  `rubocop-rspec`. The `~>` pins forced a downgrade when a consuming app pinned
+  a newer RuboCop, which blocked adding the gem to those lockfiles.
+
 ## [1.6.1] - 2026-09-28
 
 ### Added

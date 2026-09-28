@@ -23,13 +23,13 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   # RuboCop & plugins
-  spec.add_dependency 'rubocop', '~> 1.85.0'
-  spec.add_dependency 'rubocop-capybara', '~> 2.22.0'
+  spec.add_dependency 'rubocop', '>= 1.85.0'
+  spec.add_dependency 'rubocop-capybara', '>= 2.22.0'
   spec.add_dependency 'rubocop-factory_bot', '~> 2.28.0'
   spec.add_dependency 'rubocop-migration', '~> 0.7.1'
-  spec.add_dependency 'rubocop-performance', '~> 1.26.0'
-  spec.add_dependency 'rubocop-rails', '~> 2.34.0'
-  spec.add_dependency 'rubocop-rspec', '~> 3.9.0'
+  spec.add_dependency 'rubocop-performance', '>= 1.26.0'
+  spec.add_dependency 'rubocop-rails', '>= 2.34.0'
+  spec.add_dependency 'rubocop-rspec', '>= 3.9.0'
   spec.add_dependency 'rubocop-rspec_rails', '~> 2.32.0'
   spec.add_dependency 'rubocop-rubycw', '~> 0.2.0'
 
