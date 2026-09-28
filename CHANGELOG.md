@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.3] - 2026-09-28
+
+### Fixed
+
+- `Capybara/NegationMatcherAfterVisit` renamed to
+  `Capybara/RSpec/NegationMatcherAfterVisit` in the packaged `rubocop.yml`.
+  rubocop-capybara 2.23.0 moved the cop under the `Capybara/RSpec` department,
+  so the old name triggered "has the wrong namespace" warnings on 2.23.0+ and
+  on 3.0.0. The declared `rubocop-capybara` floor is raised to `>= 2.23.0`,
+  the first release where the new name is canonical.
+
 ## [1.6.2] - 2026-09-28
 
 ### Added

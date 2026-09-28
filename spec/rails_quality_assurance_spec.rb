@@ -83,6 +83,11 @@ RSpec.describe RailsQualityAssurance do
       expect(config.dig('Style/HashSyntax', 'EnforcedShorthandSyntax')).to eq('always')
       expect(config.dig('Style/Documentation', 'Enabled')).to be(false)
     end
+
+    it 'uses the Capybara/RSpec department for NegationMatcherAfterVisit' do
+      expect(raw).to have_key('Capybara/RSpec/NegationMatcherAfterVisit')
+      expect(raw).not_to have_key('Capybara/NegationMatcherAfterVisit')
+    end
   end
 
   describe 'gem dependencies' do

@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
 
   # RuboCop & plugins
   spec.add_dependency 'rubocop', '>= 1.85.0'
-  spec.add_dependency 'rubocop-capybara', '>= 2.22.0'
+  spec.add_dependency 'rubocop-capybara', '>= 2.23.0'
   spec.add_dependency 'rubocop-factory_bot', '~> 2.28.0'
   spec.add_dependency 'rubocop-migration', '~> 0.7.1'
   spec.add_dependency 'rubocop-performance', '>= 1.26.0'

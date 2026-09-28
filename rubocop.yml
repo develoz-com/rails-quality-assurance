@@ -139,5 +139,5 @@ RSpec/LetSetup:
     - "spec/controllers/**/*"
 
 # Capybara negation matcher warnings are false positives for have_no_*
-Capybara/NegationMatcherAfterVisit:
+Capybara/RSpec/NegationMatcherAfterVisit:
   Enabled: false
