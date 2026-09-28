@@ -53,10 +53,11 @@ module RailsQualityAssurance
     end
 
     def parse_threshold(value, name:, fallback:)
-      return fallback if value.nil? || value.to_s.strip.empty?
+      return fallback if value.to_s.strip.empty?
 
       number = coerce_number(value, name:)
-      number == number.to_i ? number.to_i : number
+      integer = number.to_i
+      number == integer ? integer : number
     end
 
     def coerce_number(value, name:)
