@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-10-01
+
+### Added
+
+- `rails_quality_assurance:pre_commit` generator. It installs an executable,
+  tracked `.githooks/pre-commit` that runs RuboCop, Reek, and RSpec on relevant
+  staged files (each check is skipped when nothing matching is staged) and
+  forwards to it from `.git/hooks/pre-commit` when that path is free. When a
+  shared hook manager already owns `.git/hooks/pre-commit`, the generator leaves
+  it in place and relies on the manager chaining to `.githooks/pre-commit`, so
+  the manager's other hooks (such as `prepare-commit-msg`) keep working. No
+  `core.hooksPath` is set.
+
 ## [1.6.3] - 2026-09-28
 
 ### Fixed

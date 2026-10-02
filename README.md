@@ -41,6 +41,9 @@ Opinionated quality assurance kit for Ruby on Rails applications.
 
 - **`RailsQualityAssurance::CI`**: Built-in pipeline runner modeled after Rails CI harnesses.
 - **CLI / Executable**: Run with `bundle exec rails-qa` or define your pipeline in `config/ci.rb`.
+- **Pre-commit hook**: `rails_quality_assurance:pre_commit` installs a tracked
+  `.githooks/pre-commit` (RuboCop, Reek, RSpec) that works alongside shared hook
+  managers without disabling their other hooks.
 
 ---
 
@@ -186,7 +189,7 @@ Run the generator to install `bin/ci` and `config/ci.rb`:
 bin/rails generate rails_quality_assurance:ci
 ```
 
-This generates `bin/ci` (executable) and `config/ci.rb` following Develoz standards (matching Pitwall and Develoz B2B).
+This generates `bin/ci` (executable) and `config/ci.rb` following Develoz standards.
 
 Run CI anytime on the host:
 
@@ -198,7 +201,33 @@ Or in Docker-based setups:
 bin/run bin/ci
 ```
 
-### 5. Rake Tasks (Optional)
+### 5. Pre-commit hook
+
+Run the generator to install a project-owned hook that runs RuboCop, Reek, and RSpec
+before each commit:
+
+```bash
+bin/rails generate rails_quality_assurance:pre_commit
+```
+
+It writes an executable `.githooks/pre-commit` with the checks and wires it into
+the repository:
+
+- If `.git/hooks/pre-commit` is free, it installs a small launcher that forwards
+  to `.githooks/pre-commit`.
+- If a shared hook manager already owns `.git/hooks/pre-commit` (and chains to
+  `.githooks/pre-commit` when present), the generator leaves it untouched. The
+  project checks run through the chain and the manager's other hooks, such as
+  `prepare-commit-msg`, keep working.
+
+No `core.hooksPath` is set, so hooks Git resolves through `.git/hooks` are
+unaffected. If `core.hooksPath` is already set (for example by Husky), the
+generator aborts instead of installing a hook that would never run.
+
+Each check runs only when relevant files are staged (Ruby files for RuboCop and
+Reek, spec files for RSpec). Bypass a commit with `git commit --no-verify`.
+
+### 6. Rake Tasks (Optional)
 
 The gem also provides tasks if you prefer `rake`:
 
