@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.1] - 2026-10-01
+
+### Fixed
+
+- The generated pre-commit hook resolves Reek per project shape: `bin/rails
+  qa:reek` for apps, `bundle exec rake -f spec/dummy/Rakefile qa:reek` for gems
+  and engines with a dummy app, and `bundle exec reek` for a plain gem with a
+  `.reek.yml`. Projects without any of these skip Reek instead of failing.
+
 ## [1.7.0] - 2026-10-01
 
 ### Added

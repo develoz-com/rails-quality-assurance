@@ -227,6 +227,10 @@ generator aborts instead of installing a hook that would never run.
 Each check runs only when relevant files are staged (Ruby files for RuboCop and
 Reek, spec files for RSpec). Bypass a commit with `git commit --no-verify`.
 
+Reek is resolved per project shape: `bin/rails qa:reek` in an app,
+`bundle exec rake -f spec/dummy/Rakefile qa:reek` in a gem or engine with a
+dummy app, and `bundle exec reek` in a plain gem with a `.reek.yml`.
+
 ### 6. Rake Tasks (Optional)
 
 The gem also provides tasks if you prefer `rake`:

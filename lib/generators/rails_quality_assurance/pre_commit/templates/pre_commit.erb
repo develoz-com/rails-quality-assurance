@@ -23,11 +23,13 @@ if [ -n "$(staged '*.rb' '*.rake' '*.gemspec' 'Gemfile' 'Rakefile' 'config.ru' '
   if ! bundle exec rubocop; then
     fail 'RuboCop offenses detected' 'Fix the offenses before committing, or run: bundle exec rubocop -A'
   fi
+<%- if @reek_command -%>
 
   echo 'Checking Reek...'
-  if ! bin/rails qa:reek; then
+  if ! <%= @reek_command %>; then
     fail 'Reek code smells detected' 'Fix the code smells before committing.'
   fi
+<%- end -%>
 fi
 
 if [ -n "$(staged 'spec/**/*_spec.rb' 'spec/**/*.rb')" ]; then

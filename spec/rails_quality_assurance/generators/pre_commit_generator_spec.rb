@@ -17,12 +17,40 @@ RSpec.describe RailsQualityAssurance::Generators::PreCommitGenerator do
     `git -C #{dir} config --local core.hooksPath`.strip
   end
 
+  def touch_in_project(relative_path)
+    path = File.join(dir, relative_path)
+    FileUtils.mkdir_p(File.dirname(path))
+    File.write(path, '')
+  end
+
   it 'generates a tracked, executable hook with the checks' do
     described_class.start([], destination_root: dir)
 
     expect(File.exist?(project_hook)).to be(true)
     expect(File.executable?(project_hook)).to be(true)
     expect(File.read(project_hook)).to include('bundle exec rubocop')
+  end
+
+  it 'uses bin/rails for Reek in an app' do
+    touch_in_project('bin/rails')
+
+    described_class.start([], destination_root: dir)
+
+    expect(File.read(project_hook)).to include('bin/rails qa:reek')
+  end
+
+  it 'uses the dummy Rakefile for Reek in an engine' do
+    touch_in_project('spec/dummy/Rakefile')
+
+    described_class.start([], destination_root: dir)
+
+    expect(File.read(project_hook)).to include('bundle exec rake -f spec/dummy/Rakefile qa:reek')
+  end
+
+  it 'skips Reek when neither an app nor a dummy nor a config exists' do
+    described_class.start([], destination_root: dir)
+
+    expect(File.read(project_hook)).not_to include('qa:reek')
   end
 
   it 'installs a launcher without touching core.hooksPath' do

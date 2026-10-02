@@ -14,12 +14,29 @@ module RailsQualityAssurance
       def install_hook
         guard_hooks_path
 
+        @reek_command = reek_command
         template 'pre_commit.erb', '.githooks/pre-commit'
         chmod '.githooks/pre-commit', 0o755
         install_launcher
       end
 
       private
+
+      # Reek runs through the gem's Rake task. Apps expose it via `bin/rails`;
+      # gems and engines expose it through their dummy app's Rakefile. A plain
+      # gem with its own `.reek.yml` falls back to bare Reek; otherwise the
+      # check is skipped rather than failing on a missing task.
+      def reek_command
+        return 'bin/rails qa:reek' if exist?('bin/rails')
+        return 'bundle exec rake -f spec/dummy/Rakefile qa:reek' if exist?('spec/dummy/Rakefile')
+        return 'bundle exec reek' if exist?('.reek.yml')
+
+        nil
+      end
+
+      def exist?(path)
+        File.exist?(File.join(destination_root, path))
+      end
 
       # Git ignores `.git/hooks` entirely when `core.hooksPath` is set, so the
       # launcher would never run. Fail loudly instead of installing a no-op.
