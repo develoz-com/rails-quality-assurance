@@ -240,6 +240,17 @@ Reek is resolved per project shape: `bin/rails qa:reek` in an app,
 `bundle exec rake -f spec/dummy/Rakefile qa:reek` in a gem or engine with a
 dummy app, and `bundle exec reek` in a plain gem with a `.reek.yml`.
 
+In container-based setups the checks must run inside the container, not on the
+host. Pass `--runner` to prefix every generated command:
+
+```bash
+bin/rails generate rails_quality_assurance:pre_commit --runner bin/run
+```
+
+The hook then runs `bin/run bundle exec rubocop` and so on. Rerunning the
+generator regenerates `.githooks/pre-commit`, so local edits to the file are
+overwritten — configure the generator instead.
+
 ### 6. Rake Tasks (Optional)
 
 The gem also provides tasks if you prefer `rake`:

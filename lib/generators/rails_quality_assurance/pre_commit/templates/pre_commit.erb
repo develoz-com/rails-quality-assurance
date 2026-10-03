@@ -20,8 +20,8 @@ fail() {
 
 if [ -n "$(staged '*.rb' '*.rake' '*.gemspec' 'Gemfile' 'Rakefile' 'config.ru' '.rubocop.yml' '.reek.yml')" ]; then
   echo 'Checking RuboCop...'
-  if ! bundle exec rubocop; then
-    fail 'RuboCop offenses detected' 'Fix the offenses before committing, or run: bundle exec rubocop -A'
+  if ! <%= @rubocop_command %>; then
+    fail 'RuboCop offenses detected' 'Fix the offenses before committing, or run: <%= @rubocop_command %> -A'
   fi
 <%- if @reek_command -%>
 
@@ -34,7 +34,7 @@ fi
 
 if [ -n "$(staged 'spec/**/*_spec.rb' 'spec/**/*.rb')" ]; then
   echo 'Checking RSpec...'
-  if ! bundle exec rspec --fail-fast; then
+  if ! <%= @rspec_command %>; then
     fail 'RSpec failures detected' 'Fix the failing specs before committing.'
   fi
 fi

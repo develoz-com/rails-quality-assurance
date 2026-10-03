@@ -53,6 +53,18 @@ RSpec.describe RailsQualityAssurance::Generators::PreCommitGenerator do
     expect(File.read(project_hook)).not_to include('qa:reek')
   end
 
+  it 'prefixes every check with the runner when one is given' do
+    touch_in_project('bin/rails')
+
+    described_class.start(['--runner', 'bin/run'], destination_root: dir)
+
+    content = File.read(project_hook)
+    expect(content).to include('bin/run bundle exec rubocop')
+    expect(content).to include('bin/run bin/rails qa:reek')
+    expect(content).to include('bin/run bundle exec rspec --fail-fast')
+    expect(content).not_to include('bin/run bin/run')
+  end
+
   it 'installs a launcher without touching core.hooksPath' do
     described_class.start([], destination_root: dir)
 

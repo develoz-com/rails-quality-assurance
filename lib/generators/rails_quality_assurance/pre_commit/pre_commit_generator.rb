@@ -11,16 +11,31 @@ module RailsQualityAssurance
 
       desc 'Installs a pre-commit hook for RuboCop, Reek, and RSpec'
 
+      class_option :runner, type: :string,
+                            desc: 'Prefix for the generated check commands, ' \
+                                  'for example bin/run in container-based setups'
+
       def install_hook
         guard_hooks_path
 
-        @reek_command = reek_command
+        @rubocop_command = wrap('bundle exec rubocop')
+        @reek_command = reek_command && wrap(reek_command)
+        @rspec_command = wrap('bundle exec rspec --fail-fast')
         template 'pre_commit.erb', '.githooks/pre-commit'
         chmod '.githooks/pre-commit', 0o755
         install_launcher
       end
 
       private
+
+      # Wrap a check command with the --runner prefix so it executes where the
+      # project's runtime lives, for example inside a container via bin/run.
+      def wrap(command)
+        runner = options.fetch(:runner, '').to_s
+        return command if runner.empty?
+
+        "#{runner} #{command}"
+      end
 
       # Reek runs through the gem's Rake task. Apps expose it via `bin/rails`;
       # gems and engines expose it through their dummy app's Rakefile. A plain
