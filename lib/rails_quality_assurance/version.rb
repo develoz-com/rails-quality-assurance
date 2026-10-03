@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module RailsQualityAssurance
-  VERSION = '1.8.0'
+  VERSION = '1.7.2'
 end
