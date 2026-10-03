@@ -198,22 +198,23 @@ RSpec.describe RailsQualityAssurance do
       expect(described_class.npm_audit_command).to be_nil
     end
 
-    it 'runs npm audit when a package-lock.json is present' do
+    it 'runs npm audit scoped to production dependencies when a package-lock.json is present' do
       stub_lockfiles(%w[package-lock.json])
 
-      expect(described_class.npm_audit_command).to eq('npm audit --audit-level=high')
+      expect(described_class.npm_audit_command).to eq('npm audit --audit-level=high --omit=dev')
     end
 
-    it 'runs yarn audit and masks high and critical severities for yarn.lock' do
+    it 'runs yarn audit scoped to production dependencies and masks high and critical severities' do
       stub_lockfiles(%w[yarn.lock])
 
-      expect(described_class.npm_audit_command).to eq('yarn audit; status=$?; [ $((status & 24)) -eq 0 ]')
+      expect(described_class.npm_audit_command)
+        .to eq('yarn audit --groups dependencies; status=$?; [ $((status & 24)) -eq 0 ]')
     end
 
-    it 'runs pnpm audit when a pnpm-lock.yaml is present' do
+    it 'runs pnpm audit scoped to production dependencies when a pnpm-lock.yaml is present' do
       stub_lockfiles(%w[pnpm-lock.yaml])
 
-      expect(described_class.npm_audit_command).to eq('pnpm audit --audit-level high')
+      expect(described_class.npm_audit_command).to eq('pnpm audit --audit-level high --prod')
     end
 
     it 'prefers package-lock.json when multiple lockfiles exist' do

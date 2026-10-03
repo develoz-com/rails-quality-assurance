@@ -37,16 +37,19 @@ module RailsQualityAssurance
   end
 
   # Resolves the JavaScript security audit command from the lockfile in use,
-  # gating on high and critical advisories. Returns nil when none is present.
+  # gating on high and critical advisories. Audits production dependencies only:
+  # dev tooling carries advisories that never ship, and blocking a deploy on
+  # them is noise. Returns nil when the app has no lockfile.
   def self.npm_audit_command
     if File.exist?('package-lock.json')
-      'npm audit --audit-level=high'
+      'npm audit --audit-level=high --omit=dev'
     elsif File.exist?('yarn.lock')
       # Yarn 1 ignores --level for its exit code and returns a severity bitmask
       # (info 1, low 2, moderate 4, high 8, critical 16), so mask high|critical.
-      'yarn audit; status=$?; [ $((status & 24)) -eq 0 ]'
+      # --groups dependencies limits the audit to production dependencies.
+      'yarn audit --groups dependencies; status=$?; [ $((status & 24)) -eq 0 ]'
     elsif File.exist?('pnpm-lock.yaml')
-      'pnpm audit --audit-level high'
+      'pnpm audit --audit-level high --prod'
     end
   end
 

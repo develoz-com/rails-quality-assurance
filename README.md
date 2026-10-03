@@ -24,7 +24,10 @@ Opinionated quality assurance kit for Ruby on Rails applications.
   otherwise.
 - **JavaScript Audit**: Vulnerability scanner for npm packages. Resolves the
   command from the lockfile (`package-lock.json`, `yarn.lock`, or
-  `pnpm-lock.yaml`) and fails on **high and critical** advisories.
+  `pnpm-lock.yaml`) and fails on **high and critical** advisories in
+  **production dependencies only**. Dev-only tooling (linters, test runners)
+  never ships, and its transitive advisories, some with no available fix, would
+  otherwise block CI and deploys.
 
 ### 3. Testing & Coverage
 
@@ -239,7 +242,7 @@ The gem also provides tasks if you prefer `rake`:
 bin/rails qa:lint                # Runs RuboCop, Reek, Flay, Brakeman, bundler-audit, importmap-audit, npm-audit
 bin/rails qa:audit               # Runs bundler-audit
 bin/rails qa:audit:importmap     # Runs the importmap audit when config/importmap.rb exists
-bin/rails qa:audit:npm           # Runs npm/yarn/pnpm audit for the lockfile in use, failing on high and critical
+bin/rails qa:audit:npm           # Runs npm/yarn/pnpm audit on production dependencies, failing on high and critical
 bin/rails qa:frontend            # Runs Biome and Stylelint
 bin/rails spec:parallel          # Runs RSpec in parallel with system specs isolated
 ```

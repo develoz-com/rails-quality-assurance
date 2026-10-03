@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-10-03
+
+### Changed
+
+- `qa:audit:npm` audits production dependencies only: `npm audit --omit=dev`,
+  `yarn audit --groups dependencies`, and `pnpm audit --prod`. Dev-only tooling
+  such as markdownlint and stylelint pulls transitive advisories that never
+  ship, and some have no available fix (`braces`), so the gate failed CI and
+  blocked deploys on vulnerabilities no user could reach. Apps that need dev
+  dependencies audited can run the audit command directly.
+
 ## [1.7.1] - 2026-10-01
 
 ### Fixed
