@@ -114,14 +114,10 @@ RSpec.describe RailsQualityAssurance do
       in_fresh_rake_application do
         load_quality_assurance_tasks
 
-        aggregate_failures do
-          expect(Rake::Task.task_defined?('qa:lint')).to be(true)
-          expect(Rake::Task.task_defined?('qa:reek')).to be(true)
-          expect(Rake::Task.task_defined?('qa:audit:gems')).to be(true)
-          expect(Rake::Task.task_defined?('qa:audit:importmap')).to be(true)
-          expect(Rake::Task.task_defined?('qa:audit:npm')).to be(true)
-          expect(Rake::Task.task_defined?('qa:lint:biome')).to be(true)
-          expect(Rake::Task.task_defined?('spec:parallel')).to be(true)
+        %w[qa:lint qa:reek qa:audit:gems qa:audit:importmap qa:audit:npm qa:lint:biome
+           qa:lint:stylelint qa:lint:smells qa:lint:duplication qa:lint:typecheck
+           qa:lint:deadcode qa:lint:boundaries spec:parallel].each do |name|
+          expect(Rake::Task.task_defined?(name)).to be(true), "#{name} is not defined"
         end
         expect(Rake::Task.task_defined?('lint')).to be(false)
       end
@@ -136,6 +132,67 @@ RSpec.describe RailsQualityAssurance do
           expect(Rake::Task[name].prerequisites).not_to include('environment'),
                                                         "#{name} must not require :environment"
         end
+      end
+    end
+
+    it 'runs the frontend gates through the installed CLI when present' do
+      in_fresh_rake_application do
+        load_quality_assurance_tasks
+        allow(File).to receive(:exist?).and_call_original
+        allow(File).to receive(:exist?).with(File.join('node_modules', '.bin', 'qa')).and_return(true)
+
+        commands = []
+        allow(TOPLEVEL_BINDING.receiver).to receive(:sh) { |command| commands << command }
+
+        Rake::Task['qa:lint:biome'].invoke
+
+        expect(commands).to include('node_modules/.bin/qa lint')
+      end
+    end
+
+    it 'falls back to npx when the CLI is not installed' do
+      in_fresh_rake_application do
+        load_quality_assurance_tasks
+        allow(File).to receive(:exist?).and_call_original
+        allow(File).to receive(:exist?).with(File.join('node_modules', '.bin', 'qa')).and_return(false)
+
+        commands = []
+        allow(TOPLEVEL_BINDING.receiver).to receive(:sh) { |command| commands << command }
+
+        Rake::Task['qa:lint:stylelint'].invoke
+
+        expect(commands).to include('npx --yes @develoz/quality-assurance@~0.3 styles')
+      end
+    end
+
+    it 'delegates the JavaScript audit to the CLI when a package.json is present' do
+      in_fresh_rake_application do
+        load_quality_assurance_tasks
+        allow(File).to receive(:exist?).and_call_original
+        allow(File).to receive(:exist?).with('package.json').and_return(true)
+        allow(File).to receive(:exist?).with(File.join('node_modules', '.bin', 'qa')).and_return(false)
+
+        commands = []
+        allow(TOPLEVEL_BINDING.receiver).to receive(:sh) { |command| commands << command }
+
+        Rake::Task['qa:audit:npm'].invoke
+
+        expect(commands).to include('npx --yes @develoz/quality-assurance@~0.3 audit')
+      end
+    end
+
+    it 'skips the JavaScript audit when the app has no package.json' do
+      in_fresh_rake_application do
+        load_quality_assurance_tasks
+        allow(File).to receive(:exist?).and_call_original
+        allow(File).to receive(:exist?).with('package.json').and_return(false)
+
+        commands = []
+        allow(TOPLEVEL_BINDING.receiver).to receive(:sh) { |command| commands << command }
+
+        Rake::Task['qa:audit:npm'].invoke
+
+        expect(commands).to be_empty
       end
     end
 

@@ -20,10 +20,12 @@ module RailsQualityAssurance
     File.join(root, 'config/reek.yml')
   end
 
+  # Deprecated: superseded by @develoz/quality-assurance-config; removed next major.
   def self.biome_config_path
     File.join(root, 'config/biome-default.json')
   end
 
+  # Deprecated: superseded by @develoz/quality-assurance-config; removed next major.
   def self.stylelint_config_path
     File.join(root, 'config/stylelint-default.json')
   end
@@ -36,6 +38,7 @@ module RailsQualityAssurance
       'ARGV.replace(["audit"]); require "importmap/commands"\''
   end
 
+  # Deprecated: the tasks delegate to `qa audit`; removed next major.
   # Resolves the JavaScript security audit command from the lockfile in use,
   # gating on high and critical advisories. Audits production dependencies only:
   # dev tooling carries advisories that never ship, and blocking a deploy on

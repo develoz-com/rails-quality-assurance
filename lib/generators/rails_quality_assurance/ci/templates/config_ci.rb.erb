@@ -15,8 +15,7 @@ CI.run do
   step 'Security: JavaScript audit', 'bin/rails qa:audit:npm' if File.exist?('package.json')
   step 'Security: Brakeman', 'bin/rails qa:brakeman'
 
-  step 'Frontend: Biome', 'bin/rails qa:lint:biome' if File.exist?('biome.json')
-  step 'Frontend: Stylelint', 'bin/rails qa:lint:stylelint' if File.exist?('.stylelintrc.json')
+  step 'Frontend: JavaScript', 'bin/rails qa:frontend' if File.exist?('app/javascript')
 
   # System specs render layouts that reference compiled assets.
   step 'Assets: Tailwind', 'bin/rails tailwindcss:build' if File.exist?('app/assets/tailwind/application.css')

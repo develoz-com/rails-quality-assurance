@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-10-03
+
+### Added
+
+- The `rails_quality_assurance:js` generator adds `@develoz/quality-assurance` to
+  the host `package.json`, so the frontend gates run from an installed CLI
+  instead of npx.
+- `qa:lint:smells`, `qa:lint:duplication`, `qa:lint:typecheck`,
+  `qa:lint:deadcode` and `qa:lint:boundaries` delegate to the JS CLI. Each step
+  runs only when its tool or config applies.
+
+### Changed
+
+- Frontend QA now delegates to the `@develoz/quality-assurance` npm CLI.
+  `qa:lint:biome` runs `qa lint`, `qa:lint:stylelint` runs `qa styles`, and
+  `qa:frontend` runs Biome, Stylelint, smells and duplication. The CLI is
+  resolved from `node_modules/.bin/qa` when installed, otherwise
+  `npx --yes @develoz/quality-assurance@~0.3`.
+- `qa:audit:npm` delegates to `qa audit` (npm/pnpm/yarn/bun, high severity,
+  production dependencies), replacing the hand-rolled lockfile resolution.
+- The generated `config/ci.rb` runs one `Frontend: JavaScript` step
+  (`bin/rails qa:frontend`) when `app/javascript` exists, instead of separate
+  Biome and Stylelint steps gated on app-owned configs.
+
+### Deprecated
+
+- `RailsQualityAssurance.biome_config_path`, `.stylelint_config_path` and
+  `.npm_audit_command` are no longer used by the tasks and will be removed next
+  major. The packaged `config/biome-default.json` and `config/stylelint-default.json`
+  are superseded by `@develoz/quality-assurance-config`.
+
 ## [1.7.2] - 2026-10-03
 
 ### Changed

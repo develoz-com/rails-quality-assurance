@@ -1,19 +1,20 @@
 # frozen_string_literal: true
 
-require 'json'
 require 'rails_quality_assurance'
 require 'parallel_tests/tasks'
 
-def npm_script?(name)
-  return false unless File.exist?('package.json')
+# Resolves the JavaScript quality-assurance CLI: the app's installed copy when
+# present, otherwise the published package through npx. Keeps the frontend gates
+# working without an app-side install.
+def js_qa_command
+  local = File.join('node_modules', '.bin', 'qa')
+  return local if File.exist?(local)
 
-  JSON.parse(File.read('package.json')).fetch('scripts', {}).key?(name)
-rescue JSON::ParserError
-  false
+  'npx --yes @develoz/quality-assurance@~0.3'
 end
 
 namespace :qa do
-  desc 'Run all quality assurance checks (RuboCop, Reek, Flay, Brakeman, bundler-audit, importmap-audit, npm-audit)'
+  desc 'Run all quality assurance checks (RuboCop, Reek, Flay, Brakeman, bundler-audit, importmap-audit, JS audit)'
   task lint: %w[qa:rubocop qa:reek qa:flay qa:brakeman qa:audit qa:audit:importmap qa:audit:npm]
 
   desc 'Run RuboCop'
@@ -52,10 +53,11 @@ namespace :qa do
       sh command if command
     end
 
-    desc 'Run the JavaScript package audit for the lockfile in use'
+    desc 'Run the JavaScript dependency audit via the JS quality-assurance CLI'
     task :npm do
-      command = RailsQualityAssurance.npm_audit_command
-      sh command if command
+      next unless File.exist?('package.json')
+
+      sh "#{js_qa_command} audit"
     end
   end
 
@@ -63,29 +65,44 @@ namespace :qa do
   task audit: 'qa:audit:gems'
 
   namespace :lint do
-    desc 'Run BiomeJS on JS/TS/JSON'
+    desc 'Run Biome (format + lint) through the JS quality-assurance CLI'
     task :biome do
-      if npm_script?('biome')
-        sh 'npm run biome'
-      else
-        config = File.exist?('biome.json') ? '' : "--config-path #{RailsQualityAssurance.biome_config_path}"
-        sh "npx --no-install @biomejs/biome check #{config}"
-      end
+      sh "#{js_qa_command} lint"
     end
 
-    desc 'Run Stylelint on CSS'
+    desc 'Run Stylelint through the JS quality-assurance CLI'
     task :stylelint do
-      if npm_script?('stylelint')
-        sh 'npm run stylelint'
-      else
-        config = File.exist?('.stylelintrc.json') ? '' : "--config #{RailsQualityAssurance.stylelint_config_path}"
-        sh "npx --no-install stylelint #{config} \"**/*.css\""
-      end
+      sh "#{js_qa_command} styles"
+    end
+
+    desc 'Run the Biome code-smell rules (warnings fail)'
+    task :smells do
+      sh "#{js_qa_command} smells"
+    end
+
+    desc 'Detect copied JavaScript/TypeScript with jscpd'
+    task :duplication do
+      sh "#{js_qa_command} duplication"
+    end
+
+    desc 'Type-check TypeScript with tsc (runs when the app has TypeScript)'
+    task :typecheck do
+      sh "#{js_qa_command} typecheck"
+    end
+
+    desc 'Find unused files, exports and dependencies with knip'
+    task :deadcode do
+      sh "#{js_qa_command} deadcode"
+    end
+
+    desc 'Enforce architecture boundaries with dependency-cruiser'
+    task :boundaries do
+      sh "#{js_qa_command} boundaries"
     end
   end
 
-  desc 'Run frontend linters (Biome + Stylelint)'
-  task frontend: %w[qa:lint:biome qa:lint:stylelint]
+  desc 'Run the frontend quality gates (Biome, Stylelint, smells, duplication)'
+  task frontend: %w[qa:lint:biome qa:lint:stylelint qa:lint:smells qa:lint:duplication]
 
   desc 'Run all CI checks'
   task ci: %w[qa:lint qa:frontend spec:parallel]

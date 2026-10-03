@@ -11,8 +11,14 @@ Opinionated quality assurance kit for Ruby on Rails applications.
 - **RuboCop**: Pre-configured `rubocop.yml` targeting Ruby 4.0 with all standard plugins loaded (`rubocop-rails`, `rubocop-rspec`, `rubocop-rspec_rails`, `rubocop-performance`, `rubocop-capybara`, `rubocop-factory_bot`, `rubocop-rubycw`, `rubocop-migration`).
 - **Reek**: Code smell detection with sensible Rails defaults (`config/reek.yml`).
 - **Flay**: Structural code duplication analysis.
-- **Biome**: Pre-configured `config/biome-default.json` for fast JavaScript/TypeScript/JSON linting and formatting.
-- **Stylelint**: Pre-configured `config/stylelint-default.json` with Tailwind CSS support.
+- **Frontend QA (JS/TS/CSS)**: delegated to the
+  [`@develoz/quality-assurance`](https://www.npmjs.com/package/@develoz/quality-assurance)
+  CLI. Biome lints and formats, Stylelint covers CSS/Tailwind, and the CLI adds
+  code-smell, duplication, type-check, dead-code, architecture-boundary and
+  dependency-audit gates. Tasks prefer the app's installed copy
+  (`node_modules/.bin/qa`) and fall back to `npx`, so no app-side install is
+  required. Run `rails g rails_quality_assurance:js` to pin it in
+  `package.json`.
 
 ### 2. Security
 
@@ -22,12 +28,12 @@ Opinionated quality assurance kit for Ruby on Rails applications.
   only when the app has `config/importmap.rb`, using the app `bin/importmap`
   binstub when present and a dependency-light `importmap-rails` invocation
   otherwise.
-- **JavaScript Audit**: Vulnerability scanner for npm packages. Resolves the
-  command from the lockfile (`package-lock.json`, `yarn.lock`, or
-  `pnpm-lock.yaml`) and fails on **high and critical** advisories in
-  **production dependencies only**. Dev-only tooling (linters, test runners)
-  never ships, and its transitive advisories, some with no available fix, would
-  otherwise block CI and deploys.
+- **JavaScript Audit**: Vulnerability scanner for npm packages, run through the
+  JS quality-assurance CLI (`qa audit`). Supports npm, yarn, pnpm and bun,
+  fails on **high and critical** advisories, and audits **production
+  dependencies only**. Dev-only tooling (linters, test runners) never ships, and
+  its transitive advisories, some with no available fix, would otherwise block
+  CI and deploys.
 
 ### 3. Testing & Coverage
 
@@ -239,11 +245,14 @@ dummy app, and `bundle exec reek` in a plain gem with a `.reek.yml`.
 The gem also provides tasks if you prefer `rake`:
 
 ```bash
-bin/rails qa:lint                # Runs RuboCop, Reek, Flay, Brakeman, bundler-audit, importmap-audit, npm-audit
+bin/rails qa:lint                # Runs RuboCop, Reek, Flay, Brakeman, bundler-audit, importmap-audit, JS audit
 bin/rails qa:audit               # Runs bundler-audit
 bin/rails qa:audit:importmap     # Runs the importmap audit when config/importmap.rb exists
-bin/rails qa:audit:npm           # Runs npm/yarn/pnpm audit on production dependencies, failing on high and critical
-bin/rails qa:frontend            # Runs Biome and Stylelint
+bin/rails qa:audit:npm           # Runs the JS dependency audit through the QA CLI
+bin/rails qa:frontend            # Runs Biome, Stylelint, smells and duplication
+bin/rails qa:lint:typecheck      # Runs tsc when the app has TypeScript
+bin/rails qa:lint:deadcode       # Runs knip when a knip config exists
+bin/rails qa:lint:boundaries     # Runs dependency-cruiser when a rules file exists
 bin/rails spec:parallel          # Runs RSpec in parallel with system specs isolated
 ```
 
